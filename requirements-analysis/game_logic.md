@@ -2,3 +2,4 @@ Interfaces and entities for each of the game pieces, and a 2 player turn based s
 
 Logic for determining when moves are valid and invalid, logic for determining which pieces have legal move, logic for determining a win
 
+MVP is game which works in the terminal

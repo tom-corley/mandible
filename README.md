@@ -17,10 +17,3 @@ Main challenges:
 Think about a frontend later - It would be really nice to make a mobile app eventually, but we will see. Maybe just a web app, 
 
 Some machine learning element would be really nice. Training a Hive bot somehow?
-
-# Object Modelling
-
-Bugs:
-- Ladybug
-
-
