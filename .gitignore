@@ -1,25 +1,42 @@
-# Standard Java gitignore
+HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
-!**/src/test/**/target/ 
+!**/src/test/**/target/
 
-# IDE
-.idea/
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
 .vscode/
-.cursor/
 
-# Personal Workings / Notes
-.personal/
+### Claude ###
+.claude/settings.*
 
-# AI tooling — instructions and agent memory
-CLAUDE.md
-agents/
-
-# Environment variables
+### Local config (secrets) ###
+application-local.yaml
+application-local.yml
+*.env
 .env
-.env.local
-.env.development.local
-.env.production.local
-.env.test.local
-.env.notes.local
