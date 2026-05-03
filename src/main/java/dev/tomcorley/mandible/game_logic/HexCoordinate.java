@@ -1,3 +1,7 @@
+package dev.tomcorley.mandible.game_logic;
+
+import java.util.Objects;
+
 public class HexCoordinate {
     private final int q;
     private final int r;
@@ -28,5 +32,17 @@ public class HexCoordinate {
             new HexCoordinate(q - 1, r),
             new HexCoordinate(q - 1, r + 1),
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HexCoordinate h)) return false;
+        return this.q == h.q && this.r == h.r;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(q, r);
     }
 }
