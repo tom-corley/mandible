@@ -31,6 +31,35 @@ public class HiveGrid {
         grid.put(coordinate, stack);
     }
 
+    public boolean isValidMove(HexCoordinate from, HexCoordinate to) {
+        // Validate piece to move exists
+        if (!grid.containsKey(from)) {
+            return false;
+        }
+
+        // validate destination is free
+        return !grid.containsKey(to);
+    }
+
+    public void movePiece(HexCoordinate from, HexCoordinate to) {
+        // Validate move
+        if (!isValidMove(from, to)) {
+            throw new IllegalArgumentException("Invalid move");
+        }
+
+        // Pop piece to move from stack
+        HivePiece piece = grid.get(from).pop();
+
+        // Push piece to new or existing stack
+        if (grid.containsKey(to)) {
+            grid.get(to).push(piece);
+        } else {
+            Deque<HivePiece> stack = new ArrayDeque<>();
+            stack.push(piece);
+            grid.put(to, stack);
+        }
+    }
+
     public boolean isPieceMovable(HexCoordinate coordinate) {
         if (grid.keySet().size() == 1) {
             return false;

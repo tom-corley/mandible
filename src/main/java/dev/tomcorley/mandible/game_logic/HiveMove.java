@@ -1,4 +1,4 @@
 package dev.tomcorley.mandible.game_logic;
 
-public abstract class HiveMove {
+public sealed interface HiveMove permits PlacePiece, MovePiece {
 }

@@ -28,6 +28,6 @@ This is quite different from the manhattan distance (|dx|+|dy|) over an integer 
 
 ### Geometric Intuition
 
-We can think of the axial grid as the integer latice over Z^2 with basis vectors offset by 30 or 60 degrees, instead of orthogonally.
+We can think of the axial grid as the integer latice over Z^2 with basis vectors offset by 120 degrees, instead of orthogonally.
 
-The unit ball over this metric space contains 6 points instead of 4 in the standard integer lattice. 
+The unit ball over this metric space contains 6 points instead of the 4 in the standard integer lattice. 

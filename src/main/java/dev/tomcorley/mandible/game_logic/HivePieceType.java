@@ -8,4 +8,5 @@ public enum HivePieceType {
     ANT,
     BEETLE,
     PILLBUG,
+    MOSQUITO,
 }
