@@ -7,6 +7,8 @@ import java.util.ArrayDeque;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Queue;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HiveGrid {
     private final Map<HexCoordinate, Deque<HivePiece>> grid;
@@ -19,7 +21,10 @@ public class HiveGrid {
         return grid;
     }
 
-    public void placePiece(HexCoordinate coordinate, HivePiece piece) {
+    public void placePiece(PlacePiece move) {
+        HexCoordinate coordinate = move.position();
+        HivePiece piece = move.piece();
+
         // Validate that the coordinate is free
         if (grid.containsKey(coordinate)) {
             throw new IllegalArgumentException("Coordinate already occupied");
@@ -31,7 +36,10 @@ public class HiveGrid {
         grid.put(coordinate, stack);
     }
 
-    public boolean isValidMove(HexCoordinate from, HexCoordinate to) {
+    public boolean isValidMove(MovePiece move) {
+        HexCoordinate from = move.from();
+        HexCoordinate to = move.to();
+
         // Validate piece to move exists
         if (!grid.containsKey(from)) {
             return false;
@@ -41,9 +49,12 @@ public class HiveGrid {
         return !grid.containsKey(to);
     }
 
-    public void movePiece(HexCoordinate from, HexCoordinate to) {
+    public void movePiece(MovePiece move) {
+        HexCoordinate from = move.from();
+        HexCoordinate to = move.to();
+
         // Validate move
-        if (!isValidMove(from, to)) {
+        if (!isValidMove(move)) {
             throw new IllegalArgumentException("Invalid move");
         }
 
@@ -95,5 +106,81 @@ public class HiveGrid {
         // The piece is movable iff the board without that piece is connected
         // iff the flood fill traveses all other pieces
         return occupiedCoordinates.isEmpty();
+    }
+
+    public List<MovePiece> getValidMovesForPiece(HexCoordinate coordinate) {
+        List<MovePiece> moves = new ArrayList<>();
+
+        // If piece is not movable, return empty list
+        if (!isPieceMovable(coordinate)) {
+            return moves;
+        }
+
+        HivePiece piece = grid.get(coordinate).peek();
+        HivePieceType type = piece.getType();
+
+        switch (type) {
+            case QUEEN_BEE:
+                // TODO: Implement queen bee moves
+                break;
+            case LADYBUG:
+                // TODO: Implement ladybug moves
+                break;
+            case GRASSHOPPER:
+                // TODO: Implement grasshopper moves
+                break;
+            case SPIDER:
+                // TODO: Implement spider moves
+                break;
+            case ANT:
+                // TODO: Implement ant moves
+                break;
+            case BEETLE:
+                // TODO: Implement beetle moves
+                break;
+            case PILLBUG:
+                // TODO: implement pillbug moves
+                break;
+            case MOSQUITO:
+                // TODO: implement mosquito moves
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid piece type");
+        }
+
+        return moves;
+    }
+
+    public List<HexCoordinate> getValidPlacementPositions(PlayerColour colour) {
+        List<HexCoordinate> positions = new ArrayList<>();
+
+        // Iterate over all grid points
+        for (HexCoordinate coordinate : grid.keySet()) {
+            if (grid.get(coordinate).isEmpty() || grid.get(coordinate).peek().getColour() != colour) {
+                continue;
+            }
+
+            // Current coordinate is of player colour, check if it has any valid empty neighbour positions
+            for (HexCoordinate neighbour : coordinate.getNeighbours()) {
+                if (grid.containsKey(neighbour)) {
+                    continue;
+                }
+
+                // Check if the neigbour has any neigbours of the opposite colour
+                boolean validPlacement = true;
+                for (HexCoordinate neighbourOfNeighbour : neighbour.getNeighbours()) {
+                    if (grid.containsKey(neighbourOfNeighbour) && grid.get(neighbourOfNeighbour).peek().getColour() != colour) {
+                        validPlacement = false;
+                        break;
+                    }
+                }
+
+                if (validPlacement) {
+                    positions.add(neighbour);
+                }
+            }
+        }
+
+        return positions;
     }
 }
