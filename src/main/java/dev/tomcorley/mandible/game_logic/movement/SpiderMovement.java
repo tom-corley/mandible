@@ -12,7 +12,13 @@ public class SpiderMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        // TODO: Implement spider movement logic
+        HiveGrid gridCopy = new HiveGrid(grid);
+        gridCopy.removePiece(coordinate);
+
+        // We need to construct valid paths of length 3, starting from coordinate, moving along one edge at a time
+        // TODO: implement length 3 path construction logic
+
+
         return moves;
     }
 }

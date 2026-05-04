@@ -19,6 +19,16 @@ public class HiveGrid {
         this.grid = new HashMap<>();
     }
 
+    public HiveGrid(HiveGrid other) {
+        this.grid = new HashMap<>();
+        for (Map.Entry<HexCoordinate, Deque<HivePiece>> entry : other.getGrid().entrySet()) {
+            // Use the same coordinate, mapped to a copy of the stack, referencing the same pieces
+            HexCoordinate coordinate = entry.getKey();
+            Deque<HivePiece> stack = new ArrayDeque<>(entry.getValue());
+            this.grid.put(coordinate, stack);
+        }
+    }
+
     public Map<HexCoordinate, Deque<HivePiece>> getGrid() {
         return grid;
     }
@@ -36,6 +46,17 @@ public class HiveGrid {
         stack.push(piece);
 
         grid.put(coordinate, stack);
+    }
+
+    public void removePiece(HexCoordinate coordinate) {
+        if (!grid.containsKey(coordinate)) {
+            throw new IllegalArgumentException("Coordinate not occupied");
+        }
+
+        grid.get(coordinate).pop();
+        if (grid.get(coordinate).isEmpty()) {
+            grid.remove(coordinate);
+        }
     }
 
     public boolean isValidMove(MovePiece move) {
