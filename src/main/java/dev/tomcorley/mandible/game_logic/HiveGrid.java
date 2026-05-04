@@ -1,5 +1,7 @@
 package dev.tomcorley.mandible.game_logic;
 
+import dev.tomcorley.mandible.game_logic.movement.PieceMovementStrategy;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Deque;
@@ -106,7 +108,7 @@ public class HiveGrid {
         }
 
         // The piece is movable iff the board without that piece is connected
-        // iff the flood fill traveses all other pieces
+        // iff the flood fill traverses all other pieces
         return occupiedCoordinates.isEmpty();
     }
 
@@ -119,38 +121,9 @@ public class HiveGrid {
         }
 
         HivePiece piece = grid.get(coordinate).peek();
-        HivePieceType type = piece.getType();
+        PieceMovementStrategy movementStrategy = piece.getType().getMovementStrategy();
 
-        switch (type) {
-            case QUEEN_BEE:
-                // TODO: Implement queen bee moves
-                break;
-            case LADYBUG:
-                // TODO: Implement ladybug moves
-                break;
-            case GRASSHOPPER:
-                // TODO: Implement grasshopper moves
-                break;
-            case SPIDER:
-                // TODO: Implement spider moves
-                break;
-            case ANT:
-                // TODO: Implement ant moves
-                break;
-            case BEETLE:
-                // TODO: Implement beetle moves
-                break;
-            case PILLBUG:
-                // TODO: implement pillbug moves
-                break;
-            case MOSQUITO:
-                // TODO: implement mosquito moves
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid piece type");
-        }
-
-        return moves;
+        return movementStrategy.getValidMoves(coordinate, this);
     }
 
     public List<HexCoordinate> getValidPlacementPositions(PlayerColour colour) {

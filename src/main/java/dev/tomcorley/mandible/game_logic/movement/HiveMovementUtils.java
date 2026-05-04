@@ -19,7 +19,7 @@ public class HiveMovementUtils {
             HexCoordinate neighbour = coordinate.add(direction);
 
             // If the neigbouring space is occupied, cannot slide there
-            if (!grid.getGrid().containsKey(neighbour)) {
+            if (grid.getGrid().containsKey(neighbour)) {
                 continue;
             }
 
@@ -27,13 +27,13 @@ public class HiveMovementUtils {
             int occupancyCount = 0;
 
             // Count occupancy of anti-clockwise and clockwise neighbours
-            HexDirection previousDirection = orderedDirections[(i - 1) % orderedDirections.length];
+            HexDirection previousDirection = orderedDirections[Math.floorMod(i - 1, orderedDirections.length)];
             HexCoordinate previousNeighbour = coordinate.add(previousDirection);
             if (grid.getGrid().containsKey(previousNeighbour)) {
                 occupancyCount++;
             }
 
-            HexDirection nextDirection = orderedDirections[(i + 1) % orderedDirections.length];
+            HexDirection nextDirection = orderedDirections[Math.floorMod(i + 1, orderedDirections.length)];
             HexCoordinate nextNeighbour = coordinate.add(nextDirection);
             if (grid.getGrid().containsKey(nextNeighbour)) {
                 occupancyCount++;
