@@ -27,13 +27,22 @@ public class HexCoordinate {
 
     public List<HexCoordinate> getNeighbours() {
         List<HexCoordinate> neighbours = new ArrayList<>();
-        neighbours.add(new HexCoordinate(q + 1, r));
-        neighbours.add(new HexCoordinate(q + 1, r - 1));
-        neighbours.add(new HexCoordinate(q, r + 1));
-        neighbours.add(new HexCoordinate(q, r - 1));
-        neighbours.add(new HexCoordinate(q - 1, r));
-        neighbours.add(new HexCoordinate(q - 1, r + 1));
+
+        // Iterate over all directions and add the neighbour in that direction
+        for (HexDirection direction : HexDirection.values()) {
+            HexCoordinate neighbour = this.add(direction);
+            neighbours.add(neighbour);
+        }
+
         return neighbours;
+    }
+
+    public HexCoordinate add(HexDirection direction) {
+        return new HexCoordinate(q + direction.getQ(), r + direction.getR());
+    }
+
+    public HexCoordinate add(HexCoordinate other) {
+        return new HexCoordinate(q + other.getQ(), r + other.getR());
     }
 
     @Override

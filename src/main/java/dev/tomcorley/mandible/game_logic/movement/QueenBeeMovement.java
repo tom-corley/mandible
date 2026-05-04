@@ -1,7 +1,7 @@
 package dev.tomcorley.mandible.game_logic.movement;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import dev.tomcorley.mandible.game_logic.HexCoordinate;
 import dev.tomcorley.mandible.game_logic.HiveGrid;
@@ -10,9 +10,12 @@ import dev.tomcorley.mandible.game_logic.MovePiece;
 public class QueenBeeMovement implements PieceMovementStrategy {
     @Override
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
-        List<MovePiece> moves = new ArrayList<>();
+        List<HexCoordinate> destinations = HiveMovementUtils.slideAlongOneEdge(coordinate, grid);
 
-        // TODO: Implement queen bee movement logic
+        List<MovePiece> moves = destinations.stream()
+            .map(move -> new MovePiece(coordinate, move))
+            .collect(Collectors.toList());
+
         return moves;
     }
 }
