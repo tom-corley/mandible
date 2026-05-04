@@ -1,16 +1,58 @@
 package dev.tomcorley.mandible.game_logic.movement;
 
 import java.util.List;
+
 import java.util.ArrayList;
 
 import dev.tomcorley.mandible.game_logic.HexCoordinate;
 import dev.tomcorley.mandible.game_logic.HiveGrid;
+import dev.tomcorley.mandible.game_logic.HexDirection;
+import dev.tomcorley.mandible.game_logic.MovePiece;
 
 public class HiveMovementUtils {
-    static List<HexCoordinate> slideAlongOneEdge(HexCoordinate coordinate, HiveGrid grid) {
-        List<HexCoordinate> moves = new ArrayList<>();
+    static List<MovePiece> slideAlongOneEdge(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = new ArrayList<>();
 
-        // TODO: Implement slide along one edge logic
+        HexDirection[] orderedDirections = HexDirection.values();
+        for (int i = 0; i < orderedDirections.length; i++) {
+            HexDirection direction = orderedDirections[i];
+            HexCoordinate neighbour = coordinate.add(direction);
+
+            // If the neigbouring space is occupied, cannot slide there
+            if (!grid.getGrid().containsKey(neighbour)) {
+                continue;
+            }
+
+            // If it is free, count occupancy of neighouring directions
+            int occupancyCount = 0;
+
+            // Count occupancy of anti-clockwise and clockwise neighbours
+            HexDirection previousDirection = orderedDirections[(i - 1) % orderedDirections.length];
+            HexCoordinate previousNeighbour = coordinate.add(previousDirection);
+            if (grid.getGrid().containsKey(previousNeighbour)) {
+                occupancyCount++;
+            }
+
+            HexDirection nextDirection = orderedDirections[(i + 1) % orderedDirections.length];
+            HexCoordinate nextNeighbour = coordinate.add(nextDirection);
+            if (grid.getGrid().containsKey(nextNeighbour)) {
+                occupancyCount++;
+            }
+
+            // If no piece to slide past, skip
+            if (occupancyCount == 0) {
+                continue;
+            }
+
+            // If two pieces form a gate, skip
+            if (occupancyCount == 2) {
+                continue;
+            }
+
+            // One piece to slide past, add the destination
+            moves.add(new MovePiece(coordinate, neighbour));
+        }
+
         return moves;
     }
 }
