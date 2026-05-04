@@ -1,6 +1,8 @@
 package dev.tomcorley.mandible.game_logic;
 
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HexCoordinate {
     private final int q;
@@ -23,15 +25,15 @@ public class HexCoordinate {
         return -q - r;
     }
 
-    public HexCoordinate[] getNeighbours() {
-        return new HexCoordinate[] {
-            new HexCoordinate(q + 1, r),
-            new HexCoordinate(q + 1, r - 1),
-            new HexCoordinate(q, r + 1),
-            new HexCoordinate(q, r - 1),
-            new HexCoordinate(q - 1, r),
-            new HexCoordinate(q - 1, r + 1),
-        };
+    public List<HexCoordinate> getNeighbours() {
+        List<HexCoordinate> neighbours = new ArrayList<>();
+        neighbours.add(new HexCoordinate(q + 1, r));
+        neighbours.add(new HexCoordinate(q + 1, r - 1));
+        neighbours.add(new HexCoordinate(q, r + 1));
+        neighbours.add(new HexCoordinate(q, r - 1));
+        neighbours.add(new HexCoordinate(q - 1, r));
+        neighbours.add(new HexCoordinate(q - 1, r + 1));
+        return neighbours;
     }
 
     @Override

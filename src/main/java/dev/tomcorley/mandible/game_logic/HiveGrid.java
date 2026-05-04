@@ -60,6 +60,9 @@ public class HiveGrid {
 
         // Pop piece to move from stack
         HivePiece piece = grid.get(from).pop();
+        if (grid.get(from).isEmpty()) {
+            grid.remove(from);
+        }
 
         // Push piece to new or existing stack
         if (grid.containsKey(to)) {
@@ -84,20 +87,19 @@ public class HiveGrid {
         Queue<HexCoordinate> queue = new ArrayDeque<>();
         HexCoordinate first = occupiedCoordinates.iterator().next();
         queue.add(first);
+        occupiedCoordinates.remove(first);
 
         // bfs through the set, removing visited coordinates
         while (!queue.isEmpty()) {
             // Pick from front of queue and remove from set
             HexCoordinate current = queue.poll();
-            occupiedCoordinates.remove(current);
 
             // Add all unvisited neighbours to the queue
             for (HexCoordinate neighbour : current.getNeighbours()) {
                 if (
-                    occupiedCoordinates.contains(neighbour) && 
-                    !queue.contains(neighbour) &&
-                    !current.equals(neighbour)
+                    occupiedCoordinates.contains(neighbour)
                 ) {
+                    occupiedCoordinates.remove(neighbour);
                     queue.add(neighbour);
                 }
             }
@@ -154,7 +156,20 @@ public class HiveGrid {
     public List<HexCoordinate> getValidPlacementPositions(PlayerColour colour) {
         List<HexCoordinate> positions = new ArrayList<>();
 
-        // Iterate over all grid points
+        // If the grid is empty, we must place the first piece at the origin
+        if (grid.keySet().size() == 0) {
+            positions.add(new HexCoordinate(0, 0));
+            return positions;
+        }
+
+        // If the grid has one piece, we can place the second piece in any of the neighbouring positions
+        if (grid.keySet().size() == 1) {
+            HexCoordinate first = grid.keySet().iterator().next();
+            positions.addAll(first.getNeighbours());
+            return positions;
+        }
+
+        // Otherwise, we must iterate over all grid points
         for (HexCoordinate coordinate : grid.keySet()) {
             if (grid.get(coordinate).isEmpty() || grid.get(coordinate).peek().getColour() != colour) {
                 continue;
