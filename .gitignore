@@ -40,3 +40,4 @@ application-local.yaml
 application-local.yml
 *.env
 .env
+CLAUDE.local.md
