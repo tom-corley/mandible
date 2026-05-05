@@ -12,7 +12,14 @@ public class LadybugMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        // TODO: Implement ladybug movement logic
+        // TODO: Implement ladybug movement logic:
+
+        // One beetle climb up move
+
+        // One beetle climb across move
+
+        // One beetle climb down move
+
         return moves;
     }
 }
