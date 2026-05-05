@@ -45,6 +45,12 @@ public class HexCoordinate {
         return new HexCoordinate(q + other.getQ(), r + other.getR());
     }
 
+    public EuclideanCoordinate toEuclidean() {
+        double x = ((2.0d / 3.0d) * q) + ((-1.0d / 3.0d) * r);
+        double y = (0 * q) + ((Math.sqrt(3) / 3) * r);
+        return new EuclideanCoordinate(x, y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
