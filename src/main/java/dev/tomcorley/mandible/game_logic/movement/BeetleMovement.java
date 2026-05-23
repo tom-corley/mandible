@@ -21,18 +21,45 @@ public class BeetleMovement implements PieceMovementStrategy {
 
         // If the beetle has climbed, it can climb across, climb up or climb down
         else {
-            // TODO: Implement beetle climb across, up or down movement logic
+            moves.addAll(getValidClimbAcrossMoves(coordinate, grid));
+            moves.addAll(getValidClimbDownMoves(coordinate, grid));
         }
 
         return moves;
     }
 
-    public List<MovePiece> getValidClimbUpMoves(HexCoordinate coordinate, HiveGrid grid) {
+    public static List<MovePiece> getValidClimbUpMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
         
         // Can climb on to any occupied neighbouring space
         for (HexCoordinate neighbour : coordinate.getNeighbours()) {
             if (grid.getGrid().containsKey(neighbour)) {
+                moves.add(new MovePiece(coordinate, neighbour));
+            }
+        }
+
+        return moves;
+    }
+
+    public static List<MovePiece> getValidClimbAcrossMoves(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = new ArrayList<>();
+
+        // Can climb across to any occupied neighbouring space
+        for (HexCoordinate neighbour : coordinate.getNeighbours()) {
+            if (grid.getGrid().containsKey(neighbour)) {
+                moves.add(new MovePiece(coordinate, neighbour));
+            }
+        }
+
+        return moves;
+    }
+
+    public static List<MovePiece> getValidClimbDownMoves(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = new ArrayList<>();
+
+        // Can climb down to any empty neighbouring space
+        for (HexCoordinate neighbour : coordinate.getNeighbours()) {
+            if (!grid.getGrid().containsKey(neighbour)) {
                 moves.add(new MovePiece(coordinate, neighbour));
             }
         }
