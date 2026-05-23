@@ -19,6 +19,10 @@ public class HiveGrid {
         this.grid = new HashMap<>();
     }
 
+    public boolean isCoordinateOccupied(HexCoordinate coordinate) {
+        return grid.containsKey(coordinate);
+    }
+
     public HiveGrid(HiveGrid other) {
         this.grid = new HashMap<>();
         for (Map.Entry<HexCoordinate, Deque<HivePiece>> entry : other.getGrid().entrySet()) {
@@ -57,6 +61,10 @@ public class HiveGrid {
         if (grid.get(coordinate).isEmpty()) {
             grid.remove(coordinate);
         }
+    }
+
+    public HivePiece getPiece(HexCoordinate coordinate) {
+        return grid.get(coordinate).peek();
     }
 
     public boolean isValidMove(MovePiece move) {

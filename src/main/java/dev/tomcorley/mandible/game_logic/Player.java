@@ -30,4 +30,11 @@ public class Player {
     public List<HivePiece> getHand() {
         return hand;
     }
+
+    public HivePiece getQueenBee() {
+        return hand.stream()
+            .filter(piece -> piece.getColour() == colour && piece.getType() == HivePieceType.QUEEN_BEE)
+            .findFirst()
+            .orElseThrow(() -> new IllegalStateException("Queen bee not found in hand"));
+    }
 }
