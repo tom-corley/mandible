@@ -22,4 +22,9 @@ public enum HivePieceType {
     public PieceMovementStrategy getMovementStrategy() {
         return movementStrategy;
     }
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }

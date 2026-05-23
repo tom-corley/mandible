@@ -62,4 +62,9 @@ public class HexCoordinate {
     public int hashCode() {
         return Objects.hash(q, r);
     }
+
+    @Override
+    public String toString() {
+        return "HexCoordinate(q=" + q + ", r=" + r + ")";
+    }
 }

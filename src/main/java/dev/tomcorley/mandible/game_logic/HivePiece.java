@@ -16,4 +16,9 @@ public class HivePiece {
     public HivePieceType getType() {
         return type;
     }
+
+    @Override
+    public String toString() {
+        return colour.toString() + " " + type.toString();
+    }
 }

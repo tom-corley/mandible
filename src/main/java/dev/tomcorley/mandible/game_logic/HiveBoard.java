@@ -21,6 +21,7 @@ public class HiveBoard {
         } else if (move instanceof MovePiece moveMove) {
             movePiece(moveMove);
         } else {
+            System.out.println("Somehow passed neither a place piece nor a move piece");
             throw new IllegalArgumentException("Invalid move");
         }
     }
@@ -52,7 +53,7 @@ public class HiveBoard {
         if (!isPieceOnTopOfStack(piece)) {
             return moves;
         }
-        
+
         HexCoordinate coordinate = pieceLocations.get(piece);
         moves.addAll(grid.getValidMovesForPiece(coordinate));
 

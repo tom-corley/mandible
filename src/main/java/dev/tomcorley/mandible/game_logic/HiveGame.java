@@ -70,7 +70,13 @@ public class HiveGame {
 
     public void advanceTurn() {
         HiveMove move = currentPlayer.getController().chooseMove(this);
-        makeMove(move);
+        
+        if (move == null) {
+            System.out.println("No Possible Moves, Skipping Player's Turn");
+            return;
+        } else {
+            makeMove(move);
+        }
 
         this.currentPlayer = 
           this.currentPlayer == whitePlayer 

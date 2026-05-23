@@ -73,11 +73,11 @@ public class HiveGrid {
 
         // Validate piece to move exists
         if (!grid.containsKey(from)) {
+            System.out.println("From coordinate not occupied: " + from);
             return false;
         }
 
-        // validate destination is free
-        return !grid.containsKey(to);
+        return true;
     }
 
     public void movePiece(MovePiece move) {
@@ -86,6 +86,7 @@ public class HiveGrid {
 
         // Validate move
         if (!isValidMove(move)) {
+            System.out.println("Validation failed at some point for move: " + move);
             throw new IllegalArgumentException("Invalid move");
         }
 
