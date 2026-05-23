@@ -32,39 +32,26 @@ public class HiveGame {
     }
 
     public boolean checkForWhiteWin() {
-        HivePiece blackQueenBee = blackPlayer.getQueenBee();
+       return isQueenSurrounded(blackPlayer);
+    }
+
+    public boolean checkForBlackWin() {
+        return isQueenSurrounded(whitePlayer);
+    }
+    
+    public boolean isQueenSurrounded(Player player) {
+        HivePiece queenBee = player.getQueenBee();
 
         // If queen bee is not on the board, return false
-        if (!board.getPieceLocations().containsKey(blackQueenBee)) {
+        if (!board.getPieceLocations().containsKey(queenBee)) {
             return false;
         }
         
         // Otherwise get its coordinate
-        HexCoordinate blackQueenBeeCoordinate = board.getPieceLocations().get(blackQueenBee);
+        HexCoordinate queenBeeCoordinate = board.getPieceLocations().get(queenBee);
 
         // Check for 6 occupied neighbours 
-        for (HexCoordinate neighbour : blackQueenBeeCoordinate.getNeighbours()) {
-            if (!board.getGrid().isCoordinateOccupied(neighbour)) {
-                return false;
-            }
-        }
-
-        return true;
-    }   
-
-    public boolean checkForBlackWin() {
-        HivePiece whiteQueenBee = whitePlayer.getQueenBee();
-
-        // If queen bee is not on the board, return false
-        if (!board.getPieceLocations().containsKey(whiteQueenBee)) {
-            return false;
-        }
-
-        // Otherwise get its coordinate
-        HexCoordinate whiteQueenBeeCoordinate = board.getPieceLocations().get(whiteQueenBee);
-
-        // Check for 6 occupied neighbours 
-        for (HexCoordinate neighbour : whiteQueenBeeCoordinate.getNeighbours()) {
+        for (HexCoordinate neighbour : queenBeeCoordinate.getNeighbours()) {
             if (!board.getGrid().isCoordinateOccupied(neighbour)) {
                 return false;
             }

@@ -23,12 +23,12 @@ public class HiveBoard {
         }
     }
 
-    public void placePiece(PlacePiece placeMove) {
+    private void placePiece(PlacePiece placeMove) {
         grid.placePiece(placeMove);
         pieceLocations.put(placeMove.piece(), placeMove.position());
     }
 
-    public void movePiece(MovePiece moveMove) {
+    private void movePiece(MovePiece moveMove) {
         // Get piece from grid
         HexCoordinate from = moveMove.from();
         HivePiece piece = grid.getPiece(from);
