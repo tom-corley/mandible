@@ -2,6 +2,8 @@ package dev.tomcorley.mandible.game_logic;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 public class HiveBoard {
     private final HiveGrid grid;
@@ -38,6 +40,46 @@ public class HiveBoard {
 
         // Update piece location on board
         pieceLocations.put(piece, moveMove.to());
+    }
+
+    public List<MovePiece> getValidMovesForPiece(HivePiece piece) {
+        List<MovePiece> moves = new ArrayList<>();
+
+        if (!isPiecePlaced(piece)) {
+            return moves;
+        }
+
+        if (!isPieceOnTopOfStack(piece)) {
+            return moves;
+        }
+        
+        HexCoordinate coordinate = pieceLocations.get(piece);
+        moves.addAll(grid.getValidMovesForPiece(coordinate));
+
+        return moves;
+    }
+
+    public boolean isPiecePlaced(HivePiece piece) {
+        return pieceLocations.containsKey(piece);
+    }
+
+    public boolean isPieceOnTopOfStack(HivePiece piece) {
+        // If piece is not placed, return false
+        if (!isPiecePlaced(piece)) {
+            return false;
+        }
+
+        // Get the coordinate of the piece
+        HexCoordinate coordinate = pieceLocations.get(piece);
+
+        // We need to check if the piece on the top of the stack at that coordinate is our piece
+        HivePiece topPiece = grid.getPiece(coordinate);
+        return topPiece.equals(piece);
+    }
+
+    public List<HexCoordinate> getValidPlacementCoordinates(Player player) {
+        PlayerColour colour = player.getColour();
+        return grid.getValidPlacementPositions(colour);
     }
 
     public HiveGrid getGrid() {

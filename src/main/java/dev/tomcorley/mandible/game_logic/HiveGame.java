@@ -1,5 +1,9 @@
 package dev.tomcorley.mandible.game_logic;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+
 public class HiveGame {
     private final HiveBoard board;
     private final Player whitePlayer;
@@ -72,6 +76,56 @@ public class HiveGame {
           this.currentPlayer == whitePlayer 
             ? blackPlayer 
             : whitePlayer;
+    }
+
+    public List<PlacePiece> getValidPlacementMoves(Player player) {
+        // Get valid placement coordinates
+        List<HexCoordinate> validCoordinates = board.getValidPlacementCoordinates(player);
+
+        // Get pieces in player's hand that are unplaced
+        List<HivePiece> unplacedPieces = player.getHand().stream()
+            .filter(piece -> !board.isPiecePlaced(piece))
+            .collect(Collectors.toList());
+
+        // Combine the pieces and coordinates to create placement moves
+        List<PlacePiece> placementMoves = new ArrayList<>();
+        for (HivePiece piece : unplacedPieces) {
+            for (HexCoordinate coordinate : validCoordinates) {
+                placementMoves.add(new PlacePiece(coordinate, piece));
+            }
+        }
+
+        return placementMoves;
+    }
+
+    public List<MovePiece> getValidMoveMoves(Player player) {
+        List<MovePiece> moves = new ArrayList<>();
+        List<HivePiece> playerPieces = player.getHand();
+
+        for (HivePiece piece : playerPieces) {
+            List<MovePiece> pieceMoves = board.getValidMovesForPiece(piece);
+            moves.addAll(pieceMoves);
+        }
+
+        return moves;
+    }
+
+    
+
+    public List<HiveMove> getValidMovesForPlayer(Player player) {
+        List<HiveMove> moves = new ArrayList<>();
+
+        // Get all valid placement moves
+        List<PlacePiece> placementMoves = getValidPlacementMoves(player);
+
+        // Get all valid move moves
+        List<MovePiece> moveMoves = getValidMoveMoves(player);
+
+        // Combine the moves
+        moves.addAll(placementMoves);
+        moves.addAll(moveMoves);
+
+        return moves;
     }
 
     public HiveGameState getState() {

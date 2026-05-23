@@ -1,17 +1,23 @@
 package dev.tomcorley.mandible.game_logic;
+
+import java.util.List;
+import java.util.Random;
+
 public class BotController implements PlayerController {
-    
+    private final Player player;
+
+    public BotController(Player player) {
+        this.player = player;
+    }
+
     @Override
     public HiveMove chooseMove(HiveGame game) {
-        return null;
-        // TODO: Implement this
 
-        // Get all valid placement moves
+        // Get valid moves for player
+        List<HiveMove> validMoves = game.getValidMovesForPlayer(player);
 
-        // Get all valid move moves
-
-        // How do we actually choose a move?
-
-        // Maybe for now we just choose a random move?
+        // Maybe for now we just choose a random integer between 0 and the number of valid moves
+        int randomIndex = new Random().nextInt(validMoves.size());
+        return validMoves.get(randomIndex);
     }
 }
