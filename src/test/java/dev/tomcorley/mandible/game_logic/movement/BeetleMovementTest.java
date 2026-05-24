@@ -191,5 +191,108 @@ class BeetleMovementTest {
             assertSame(beetle, grid.getPiece(ORIGIN));
             assertEquals(2, grid.getGrid().get(ORIGIN).size());
         }
+
+        @Test
+        @DisplayName("climb-across targets where beetle stays at same height")
+        void climbAcrossKeepsSameHeight() {
+            // Origin: height 2 (ant + beetle), (-1,0): height 1 (queen)
+            // Beetle at height 2 → lands on height 1+1=2 → same height → climb across
+            stackBeetleOnOrigin();
+
+            List<MovePiece> climbAcross = BeetleMovement.getValidClimbAcrossMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = climbAcross.stream().map(MovePiece::to).toList();
+
+            assertTrue(destinations.contains(new HexCoordinate(-1, 0)));
+        }
+
+        @Test
+        @DisplayName("climb-across blocked by gate")
+        void climbAcrossBlockedByGate() {
+            // Beetle on stack of 2 at origin, with two height-2 flanking stacks forming a gate
+            place(black(HivePieceType.ANT), ORIGIN);
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));
+            // Origin: height 2
+
+            // Target at NE: need a height-1 stack (climb-across from height 2 needs dest that results in same height)
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NE));
+
+            // Flanking stacks at N and SE, both height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.N)));
+
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.SE)));
+
+            List<MovePiece> moves = BeetleMovement.getValidClimbAcrossMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+            // NE should be blocked by the gate formed by N and SE
+            assertFalse(destinations.contains(ORIGIN.add(HexDirection.NE)));
+        }
+
+        @Test
+        @DisplayName("climb-up does not require gate check")
+        void climbUpIgnoresGate() {
+            // Beetle at origin, with occupied N and SE forming what would be a gate for NE
+            place(white(HivePieceType.BEETLE), ORIGIN);
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NE));
+
+            List<MovePiece> climbUps = BeetleMovement.getValidClimbUpMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = climbUps.stream().map(MovePiece::to).toList();
+
+            // NE is a valid climb-up target despite the "gate"
+            assertTrue(destinations.contains(ORIGIN.add(HexDirection.NE)));
+        }
+
+        @Test
+        @DisplayName("climb-down to empty spaces does not require gate check")
+        void climbDownIgnoresGate() {
+            // Beetle on a stack, flanking pieces that would form a gate
+            place(black(HivePieceType.ANT), ORIGIN);
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(-1, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));
+            // Origin: height 2
+
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            // N and SE would gate NE for sliding, but climb-down ignores gates
+
+            List<MovePiece> climbDowns = BeetleMovement.getValidClimbDownMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = climbDowns.stream().map(MovePiece::to).toList();
+
+            assertTrue(destinations.contains(ORIGIN.add(HexDirection.NE)));
+        }
+
+        @Test
+        @DisplayName("climb-down includes empty neighbours")
+        void climbDownToEmpty() {
+            stackBeetleOnOrigin();
+
+            List<MovePiece> climbDowns = BeetleMovement.getValidClimbDownMoves(ORIGIN, grid);
+
+            assertFalse(climbDowns.isEmpty());
+            for (MovePiece move : climbDowns) {
+                assertTrue(grid.getStackHeight(move.to()) < grid.getStackHeight(ORIGIN));
+            }
+        }
+
+        @Test
+        @DisplayName("climb-up only targets taller destinations")
+        void climbUpOnlyToTaller() {
+            stackBeetleOnOrigin();
+            // Origin: height 2. (-1,0): height 1.
+
+            List<MovePiece> climbUps = BeetleMovement.getValidClimbUpMoves(ORIGIN, grid);
+
+            for (MovePiece move : climbUps) {
+                assertTrue(grid.getStackHeight(move.to()) >= grid.getStackHeight(ORIGIN));
+            }
+        }
     }
 }

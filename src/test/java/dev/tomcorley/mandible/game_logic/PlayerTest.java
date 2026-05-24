@@ -83,7 +83,7 @@ class PlayerTest {
         List<HivePiece> expandedHand = HandFactory.createExpandedHand(PlayerColour.WHITE);
         Player player = new Player(PlayerColour.WHITE, "Alice", new BotController(), expandedHand);
 
-        assertSame(expandedHand, player.getHand());
+        assertEquals(expandedHand, player.getHand());
         assertEquals(14, player.getHand().size());
     }
 

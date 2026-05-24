@@ -353,6 +353,212 @@ class HiveGridTest {
         }
     }
 
+    // --- Stack height ---
+
+    @Nested
+    @DisplayName("getStackHeight")
+    class StackHeightTests {
+
+        @Test
+        @DisplayName("empty coordinate returns 0")
+        void emptyReturnsZero() {
+            assertEquals(0, grid.getStackHeight(ORIGIN));
+        }
+
+        @Test
+        @DisplayName("single piece returns 1")
+        void singlePieceReturnsOne() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            assertEquals(1, grid.getStackHeight(ORIGIN));
+        }
+
+        @Test
+        @DisplayName("stacked pieces return correct height")
+        void stackedPiecesReturnHeight() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(1, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(1, 0), ORIGIN));
+
+            assertEquals(2, grid.getStackHeight(ORIGIN));
+        }
+    }
+
+    // --- Gate check ---
+
+    @Nested
+    @DisplayName("gateCheck")
+    class GateCheckTests {
+
+        @Test
+        @DisplayName("both flanking neighbours occupied and tall enough blocks")
+        void bothFlankingOccupiedBlocks() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+
+            assertTrue(grid.gateCheck(ORIGIN, HexDirection.NE));
+        }
+
+        @Test
+        @DisplayName("one flanking neighbour empty does not block")
+        void oneFlankingEmptyAllows() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+
+            assertFalse(grid.gateCheck(ORIGIN, HexDirection.NE));
+        }
+
+        @Test
+        @DisplayName("flanking neighbours shorter than current stack do not block")
+        void shorterFlankingDoesNotBlock() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(1, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(1, 0), ORIGIN));
+            // Origin is now height 2
+
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            // Flanking are height 1, current is height 2
+
+            assertFalse(grid.gateCheck(ORIGIN, HexDirection.NE));
+        }
+
+        @Test
+        @DisplayName("flanking neighbours at same height as current stack blocks")
+        void sameHeightFlankingBlocks() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));
+            // Origin is height 2
+
+            // Build height-2 stacks on flanking positions
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(whitePiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.N)));
+
+            place(blackPiece(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            place(whitePiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.SE)));
+
+            assertTrue(grid.gateCheck(ORIGIN, HexDirection.NE));
+        }
+    }
+
+    // --- Climb direction checks ---
+
+    @Nested
+    @DisplayName("isClimbUp / isClimbDown / isClimbAcross")
+    class ClimbDirectionTests {
+
+        @Test
+        @DisplayName("isClimbUp — destination taller than origin")
+        void climbUpToTallerStack() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+
+            assertTrue(grid.isClimbUp(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbUp — empty to occupied is climb up")
+        void climbUpFromEmpty() {
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+
+            assertTrue(grid.isClimbUp(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbUp — taller to shorter is not climb up")
+        void tallerToShorterIsNotClimbUp() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));
+            // Origin height 2
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            // Destination height 1
+
+            assertFalse(grid.isClimbUp(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbDown — taller origin to empty is climb down")
+        void climbDownToEmpty() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(1, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(1, 0), ORIGIN));
+            // Origin height 2, destination empty
+
+            assertTrue(grid.isClimbDown(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbDown — height 1 to empty is not climb down")
+        void height1ToEmptyIsNotClimbDown() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+
+            assertFalse(grid.isClimbDown(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbDown — empty origin is not climb down")
+        void emptyOriginIsNotClimbDown() {
+            assertFalse(grid.isClimbDown(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbAcross — destination one shorter means beetle stays same height")
+        void climbAcrossDestOneShorter() {
+            // Origin height 2, destination height 1 → beetle at 2 lands on 1+1=2 → across
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));
+            // Origin: height 2
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            // Destination: height 1
+
+            assertTrue(grid.isClimbAcross(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbAcross — same height stacks is climb up not across")
+        void sameHeightIsClimbUpNotAcross() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            // Both height 1 → beetle at 1 lands on 1+1=2 → going up
+
+            assertFalse(grid.isClimbAcross(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbAcross — destination taller is not climb across")
+        void tallerDestNotClimbAcross() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.BEETLE), new HexCoordinate(1, 0));
+            place(whitePiece(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), new HexCoordinate(1, 0)));
+            // Origin height 1, destination height 2
+
+            assertFalse(grid.isClimbAcross(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbAcross — height 1 to empty is climb across")
+        void height1ToEmptyIsClimbAcross() {
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            // Origin height 1, destination empty (height 0) → beetle at 1 lands on 0+1=1 → across
+
+            assertTrue(grid.isClimbAcross(ORIGIN, new HexCoordinate(1, 0)));
+        }
+
+        @Test
+        @DisplayName("isClimbAcross — empty origin is not climb across")
+        void emptyOriginNotClimbAcross() {
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+
+            assertFalse(grid.isClimbAcross(ORIGIN, new HexCoordinate(1, 0)));
+        }
+    }
+
     // --- Copy constructor ---
 
     @Nested

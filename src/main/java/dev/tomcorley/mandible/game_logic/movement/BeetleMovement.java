@@ -61,6 +61,12 @@ public class BeetleMovement implements PieceMovementStrategy {
         return moves;
     }
 
+    public static List<MovePiece> getValidClimbAcrossAboveFloorMoves(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = getValidClimbAcrossMoves(coordinate, grid);
+        moves.removeIf(move -> grid.getStackHeight(move.to()) == 0);
+        return moves;
+    }
+
     public static List<MovePiece> getValidClimbDownMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
@@ -71,6 +77,18 @@ public class BeetleMovement implements PieceMovementStrategy {
             }
         }
 
+        return moves;
+    }
+
+    public static List<MovePiece> getValidClimbDownAboveFloorMoves(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = getValidClimbDownMoves(coordinate, grid);
+        moves.removeIf(move -> grid.getStackHeight(move.to()) == 0);
+        return moves;
+    }
+
+    public static List<MovePiece> getValidClimbDownToFloorMoves(HexCoordinate coordinate, HiveGrid grid) {
+        List<MovePiece> moves = getValidClimbDownMoves(coordinate, grid);
+        moves.removeIf(move -> grid.getStackHeight(move.to()) > 0);
         return moves;
     }
 }

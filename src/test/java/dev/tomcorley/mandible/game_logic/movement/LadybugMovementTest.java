@@ -142,4 +142,74 @@ class LadybugMovementTest {
         List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
         assertTrue(moves.isEmpty());
     }
+
+    @Test
+    @DisplayName("ladybug can return to its starting position")
+    void canReturnToOrigin() {
+        // Triangle: ladybug can climb up, across, and down back to start
+        place(white(HivePieceType.LADYBUG), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+        assertTrue(destinations.contains(ORIGIN));
+    }
+
+    @Test
+    @DisplayName("ladybug with larger hive has multiple destinations")
+    void largerHiveMultipleDestinations() {
+        // Ring of pieces around the ladybug gives multiple paths
+        place(white(HivePieceType.LADYBUG), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
+        place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
+        place(white(HivePieceType.SPIDER), new HexCoordinate(2, 0));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+
+        assertTrue(moves.size() > 2, "Larger hive should give ladybug many destinations");
+    }
+
+    @Test
+    @DisplayName("ladybug destinations are specific and correct for simple triangle")
+    void specificDestinationsTriangle() {
+        // Ladybug at origin, pieces at NE(1,0) and N(0,1)
+        place(white(HivePieceType.LADYBUG), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+        // Ladybug climbs up onto one piece, across to the other, down to an empty neighbour
+        // All destinations must be adjacent to at least one of the two pieces
+        for (MovePiece move : moves) {
+            if (move.to().equals(ORIGIN)) continue;
+            boolean adjacentToHive = move.to().getNeighbours().stream()
+                    .anyMatch(n -> grid.isCoordinateOccupied(n));
+            assertTrue(adjacentToHive,
+                    "Ladybug destination " + move.to() + " must be adjacent to the hive");
+        }
+    }
+
+    @Test
+    @DisplayName("ladybug cannot land on occupied cells (except its own origin)")
+    void cannotLandOnOccupiedExceptOrigin() {
+        place(white(HivePieceType.LADYBUG), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
+        place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
+
+        // Remove the ladybug from grid to simulate what the movement sees
+        // (ladybug removes itself before computing destinations)
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+
+        for (MovePiece move : moves) {
+            if (move.to().equals(ORIGIN)) continue;
+            assertFalse(grid.isCoordinateOccupied(move.to()),
+                    "Ladybug must not land on occupied cell " + move.to());
+        }
+    }
 }

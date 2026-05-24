@@ -1,7 +1,7 @@
 package dev.tomcorley.mandible.game_logic.movement;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import dev.tomcorley.mandible.game_logic.HexCoordinate;
@@ -13,25 +13,36 @@ public class LadybugMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        // One beetle climb up move
+        // 1. One beetle climb up move
         List<MovePiece> firstLadybugMoves = new ArrayList<>();
         firstLadybugMoves.addAll(BeetleMovement.getValidClimbUpMoves(coordinate, grid));
 
-        // One beetle climb across or climb up move
+        // 2. One beetle climb across or climb up move — must stay on top of the hive
         List<MovePiece> secondLadybugMoves = new ArrayList<>();
         HiveGrid gridCopy = new HiveGrid(grid);
-        gridCopy.removePiece(coordinate);
         for (MovePiece firstMove : firstLadybugMoves) {
-            secondLadybugMoves.addAll(BeetleMovement.getValidClimbAcrossMoves(firstMove.to(), gridCopy));
+            gridCopy.movePiece(firstMove);
+            secondLadybugMoves.addAll(BeetleMovement.getValidClimbAcrossAboveFloorMoves(firstMove.to(), gridCopy));
             secondLadybugMoves.addAll(BeetleMovement.getValidClimbUpMoves(firstMove.to(), gridCopy));
+            secondLadybugMoves.addAll(BeetleMovement.getValidClimbDownAboveFloorMoves(firstMove.to(), gridCopy));
+            gridCopy.movePiece(firstMove.invertMove());
         }
-        secondLadybugMoves = secondLadybugMoves.stream().distinct().collect(Collectors.toList());
 
-        // One beetle climb down move
-        List<MovePiece> thirdLadybugMoves = new ArrayList<>();
+        // Create list of two step moves and deduplicate
+        List<MovePiece> twoStepMoves = new ArrayList<>();
         for (MovePiece secondMove : secondLadybugMoves) {
-            thirdLadybugMoves.addAll(BeetleMovement.getValidClimbDownMoves(secondMove.to(), gridCopy));
+            twoStepMoves.add(new MovePiece(coordinate, secondMove.to()));
         }
+        twoStepMoves = twoStepMoves.stream().distinct().collect(Collectors.toList());
+
+        // 3. Climb down off the hive to any empty adjacent space
+        List<MovePiece> thirdLadybugMoves = new ArrayList<>();
+        for (MovePiece firstTwoMoves : twoStepMoves) {
+            gridCopy.movePiece(firstTwoMoves);
+            thirdLadybugMoves.addAll(BeetleMovement.getValidClimbDownToFloorMoves(firstTwoMoves.to(), gridCopy));
+            gridCopy.movePiece(firstTwoMoves.invertMove());
+        }
+
         // Make from of the move original starting coordinate
         for (MovePiece thirdMove : thirdLadybugMoves) {
             moves.add(new MovePiece(coordinate, thirdMove.to()));

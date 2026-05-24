@@ -5,4 +5,8 @@ public record MovePiece(HexCoordinate from, HexCoordinate to) implements HiveMov
     public String toString() {
         return "Moving" + " from " + from + " to " + to;
     }
+
+    public MovePiece invertMove() {
+        return new MovePiece(to, from);
+    }
 }

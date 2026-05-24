@@ -5,4 +5,8 @@ public record PlacePiece(HexCoordinate position, HivePiece piece) implements Hiv
     public String toString() {
         return "Placing " + piece + " at " + position;
     }
+
+    public RemovePiece invertMove() {
+        return new RemovePiece(position);
+    }
 }

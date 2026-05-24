@@ -72,7 +72,21 @@ public class HiveGrid {
         grid.put(coordinate, stack);
     }
 
+    public void removePiece(RemovePiece move) {
+        HexCoordinate coordinate = move.position();
+
+        if (!grid.containsKey(coordinate)) {
+            throw new IllegalArgumentException("Coordinate not occupied");
+        }
+
+        grid.get(coordinate).pop();
+        if (grid.get(coordinate).isEmpty()) {
+            grid.remove(coordinate);
+        }
+    }
+
     public void removePiece(HexCoordinate coordinate) {
+        // TODO: deprecate this and use above
         if (!grid.containsKey(coordinate)) {
             throw new IllegalArgumentException("Coordinate not occupied");
         }
@@ -191,8 +205,8 @@ public class HiveGrid {
             return false;
         }
 
-        // Otherwise it is a climb across if the current has height equal to the destination minus one
-        return grid.get(from).size() == grid.get(to).size() - 1;
+        // Otherwise it is a climb across if the current has height equal to the destination plus one
+        return grid.get(from).size() == grid.get(to).size() + 1;
     }
 
     public boolean isPieceMovable(HexCoordinate coordinate) {
