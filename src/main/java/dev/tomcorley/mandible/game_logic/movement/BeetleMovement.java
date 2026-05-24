@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import dev.tomcorley.mandible.game_logic.HexCoordinate;
 import dev.tomcorley.mandible.game_logic.HiveGrid;
 import dev.tomcorley.mandible.game_logic.MovePiece;
+import dev.tomcorley.mandible.game_logic.HexDirection;
 
 public class BeetleMovement implements PieceMovementStrategy {
     @Override
@@ -19,8 +20,9 @@ public class BeetleMovement implements PieceMovementStrategy {
             moves.addAll(getValidClimbUpMoves(coordinate, grid));
         }
 
-        // If the beetle has climbed, it can climb across, climb up or climb down
+        // If the beetle has climbed, it can climb up, across or down
         else {
+            moves.addAll(getValidClimbUpMoves(coordinate, grid));
             moves.addAll(getValidClimbAcrossMoves(coordinate, grid));
             moves.addAll(getValidClimbDownMoves(coordinate, grid));
         }
@@ -33,7 +35,7 @@ public class BeetleMovement implements PieceMovementStrategy {
         
         // Can climb on to any occupied neighbouring space
         for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (grid.getGrid().containsKey(neighbour)) {
+            if (grid.isClimbUp(coordinate, neighbour)) {
                 moves.add(new MovePiece(coordinate, neighbour));
             }
         }
@@ -45,10 +47,15 @@ public class BeetleMovement implements PieceMovementStrategy {
         List<MovePiece> moves = new ArrayList<>();
 
         // Can climb across to any occupied neighbouring space
-        for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (grid.getGrid().containsKey(neighbour)) {
-                moves.add(new MovePiece(coordinate, neighbour));
+        for (HexDirection direction : HexDirection.values()) {
+            HexCoordinate neighbour = coordinate.add(direction);
+            boolean isClimbAcross = grid.isClimbAcross(coordinate, neighbour);
+
+            if (!isClimbAcross || grid.gateCheck(coordinate, direction)) {
+                continue;
             }
+
+            moves.add(new MovePiece(coordinate, neighbour));
         }
 
         return moves;
@@ -59,7 +66,7 @@ public class BeetleMovement implements PieceMovementStrategy {
 
         // Can climb down to any empty neighbouring space
         for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (!grid.getGrid().containsKey(neighbour)) {
+            if (grid.isClimbDown(coordinate, neighbour)) {
                 moves.add(new MovePiece(coordinate, neighbour));
             }
         }

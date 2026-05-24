@@ -17,12 +17,13 @@ public class LadybugMovement implements PieceMovementStrategy {
         List<MovePiece> firstLadybugMoves = new ArrayList<>();
         firstLadybugMoves.addAll(BeetleMovement.getValidClimbUpMoves(coordinate, grid));
 
-        // One beetle climb across move
+        // One beetle climb across or climb up move
         List<MovePiece> secondLadybugMoves = new ArrayList<>();
         HiveGrid gridCopy = new HiveGrid(grid);
         gridCopy.removePiece(coordinate);
         for (MovePiece firstMove : firstLadybugMoves) {
             secondLadybugMoves.addAll(BeetleMovement.getValidClimbAcrossMoves(firstMove.to(), gridCopy));
+            secondLadybugMoves.addAll(BeetleMovement.getValidClimbUpMoves(firstMove.to(), gridCopy));
         }
         secondLadybugMoves = secondLadybugMoves.stream().distinct().collect(Collectors.toList());
 

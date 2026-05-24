@@ -1,6 +1,7 @@
 package dev.tomcorley.mandible.game_logic;
 
 import java.util.List;
+import java.util.Collections;
 
 public class Player {
     private final PlayerColour colour;
@@ -32,7 +33,7 @@ public class Player {
     }
 
     public List<HivePiece> getHand() {
-        return hand;
+        return Collections.unmodifiableList(hand);
     }
 
     public HivePiece getQueenBee() {

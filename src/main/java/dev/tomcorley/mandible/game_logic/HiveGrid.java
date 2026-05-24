@@ -12,16 +12,13 @@ import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import java.util.Collections;
 
 public class HiveGrid {
     private final Map<HexCoordinate, Deque<HivePiece>> grid;
 
     public HiveGrid() {
         this.grid = new HashMap<>();
-    }
-
-    public boolean isCoordinateOccupied(HexCoordinate coordinate) {
-        return grid.containsKey(coordinate);
     }
 
     public HiveGrid(HiveGrid other) {
@@ -34,8 +31,30 @@ public class HiveGrid {
         }
     }
 
+    public int getStackHeight(HexCoordinate coordinate) {
+        if (!grid.containsKey(coordinate)) {
+            return 0;
+        }
+
+        return grid.get(coordinate).size();
+    }
+
+    public boolean isCoordinateOccupied(HexCoordinate coordinate) {
+        return grid.containsKey(coordinate);
+    }
+
+    public boolean gateCheck(HexCoordinate coordinate, HexDirection direction) {
+        int gateHeight = grid.get(coordinate).size();
+        HexCoordinate anticlockwiseNeighbour = coordinate.add(direction.antiClockwise());
+        HexCoordinate clockwiseNeighbour = coordinate.add(direction.clockwise());
+        boolean antiClockwiseGated = isCoordinateOccupied(anticlockwiseNeighbour) && getStackHeight(anticlockwiseNeighbour) >= gateHeight && getStackHeight(clockwiseNeighbour) >= gateHeight;
+        boolean clockwiseGated = isCoordinateOccupied(clockwiseNeighbour) && getStackHeight(clockwiseNeighbour) >= gateHeight && getStackHeight(anticlockwiseNeighbour) >= gateHeight;
+            
+        return antiClockwiseGated && clockwiseGated;
+    }
+
     public Map<HexCoordinate, Deque<HivePiece>> getGrid() {
-        return grid;
+        return Collections.unmodifiableMap(grid);
     }
 
     public void placePiece(PlacePiece move) {
@@ -70,7 +89,6 @@ public class HiveGrid {
 
     public boolean isValidMove(MovePiece move) {
         HexCoordinate from = move.from();
-        HexCoordinate to = move.to();
 
         // Validate piece to move exists
         if (!grid.containsKey(from)) {
@@ -105,6 +123,76 @@ public class HiveGrid {
             stack.push(piece);
             grid.put(to, stack);
         }
+    }
+
+    public boolean isClimbUp(HexCoordinate from, HexCoordinate to) {
+        // Both have height zero
+        if (!grid.containsKey(from) && !grid.containsKey(to)) {
+            return true;
+        }
+
+        // Current has height zero, so must be climb up
+        if (!grid.containsKey(from)) {
+            return true;
+        }
+
+        // Other having height zero so is climb down or across
+        if (!grid.containsKey(to)) {
+            return false;
+        }
+
+        // Equal size means destination would get taller, so is climb up
+        return grid.get(from).size() <= grid.get(to).size();
+    }
+
+    public boolean isClimbDown(HexCoordinate from, HexCoordinate to) {
+        // Both have height zero
+        if (!grid.containsKey(from) && !grid.containsKey(to)) {
+            return false;
+        }
+
+        // Current has height zero, so is climb up
+        if (!grid.containsKey(from)) {
+            return false;
+        }
+        
+        // If the destination has height zero, it is a climb down if the current has height two or more
+        if (!grid.containsKey(to) && grid.get(from).size() >= 2) {
+            return true;
+        }
+
+        // Otherwise it is a climb across
+        if (!grid.containsKey(to)) {
+            return false;
+        }
+
+        // In general, it is a climb down if the current has height greater than the destination plus one
+        return grid.get(from).size() > grid.get(to).size() + 1;
+    }
+
+    public boolean isClimbAcross(HexCoordinate from, HexCoordinate to) {
+        // If both have height zero, it is a climb up
+        if (!grid.containsKey(from) && !grid.containsKey(to)) {
+            return false;
+        }
+
+        // If current has height zero but not destination, it is a climb up
+        if (!grid.containsKey(from)) {
+            return false;
+        }
+
+        // If destination has height zero but not current, it is a climb across if current has height 1
+        if (!grid.containsKey(to) && grid.get(from).size() == 1) {
+            return true;
+        }
+
+        // Otherwise it is a climb down
+        if (!grid.containsKey(to)) {
+            return false;
+        }
+
+        // Otherwise it is a climb across if the current has height equal to the destination minus one
+        return grid.get(from).size() == grid.get(to).size() - 1;
     }
 
     public boolean isPieceMovable(HexCoordinate coordinate) {

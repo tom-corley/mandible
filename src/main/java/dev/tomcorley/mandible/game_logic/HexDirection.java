@@ -1,5 +1,7 @@
 package dev.tomcorley.mandible.game_logic;
 
+import java.util.List;
+
 public enum HexDirection {
     N(0, 1),
     NE(1, 0),
@@ -23,5 +25,17 @@ public enum HexDirection {
 
     public int getR() {
         return r;
+    }
+
+    public HexDirection clockwise() {
+        return values()[Math.floorMod(this.ordinal() + 1, values().length)];
+    }
+
+    public HexDirection antiClockwise() {
+        return values()[Math.floorMod(this.ordinal() - 1, values().length)];
+    }
+
+    public List<HexDirection> getNeighbouringDirections() {
+        return List.of(this.antiClockwise(), this.clockwise());
     }
 }

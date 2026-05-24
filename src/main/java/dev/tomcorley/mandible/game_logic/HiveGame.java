@@ -22,6 +22,10 @@ public class HiveGame {
     }
 
     public void checkWinCondition() {
+        if (state != HiveGameState.IN_PROGRESS) {
+            return;
+        }
+
         boolean whiteWon = checkForWhiteWin();
 
         boolean blackWon = checkForBlackWin();

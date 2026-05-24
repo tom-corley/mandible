@@ -6,37 +6,25 @@ Pre-Phase 2 (REST API) audit of the Hive game engine. Findings ranked by severit
 
 ## High
 
-### 1. No move validation in `makeMove`
+### ~~1. No move validation in `makeMove`~~ — Resolved
 
-**File:** `HiveGame.java:69-71`
+See Resolved table.
 
-Accepts any `HiveMove` with zero validation. No check for correct player's turn, no check the move is in the valid set, no queen-by-turn-4 enforcement. Fine internally, but a REST API receives arbitrary moves from untrusted clients.
+### ~~2. Mutable internals exposed through getters~~ — Resolved
 
-### 2. Mutable internals exposed through getters
+See Resolved table.
 
-**Files:** `HiveBoard.getPieceLocations()`, `HiveGrid.getGrid()`, `Player.getHand()`
+### ~~3. `PlayerController` couples I/O to game logic~~ — Phase 2
 
-All return raw mutable collections. Any caller can mutate game state without going through the APIs. In a REST context with concurrent requests, this is a data corruption vector.
+Phase 2 concern. `GameRunner` and `PlayerController` are console simulation artifacts that won't exist in the REST API. See `design/rest-api-architecture.md`.
 
-**Fix:** Return `Collections.unmodifiableMap()` / `Collections.unmodifiableList()`.
+### ~~4. `checkWinCondition` can reset a finished game to `IN_PROGRESS`~~ — Resolved
 
-### 3. `PlayerController` couples I/O to game logic
+See Resolved table.
 
-**File:** `PlayerController.java`
+### ~~5. `getValidPlacementPositions` can return duplicates~~ — Resolved
 
-`chooseMove(HiveGame game)` passes the entire mutable game to the controller, blocks the thread, and drives via a `while` loop in `GameRunner`. In a REST API moves arrive asynchronously via HTTP. You need a request-response model.
-
-### 4. `checkWinCondition` can reset a finished game to `IN_PROGRESS`
-
-**File:** `HiveGame.java:36`
-
-The `else` branch sets `state = IN_PROGRESS`. If called again after a game ends, it can un-end the game. Once a game finishes, the state should be immutable.
-
-### 5. `getValidPlacementPositions` can return duplicates
-
-**File:** `HiveGrid.java:159-203`
-
-Two friendly pieces sharing an empty neighbour both add it. No deduplication. This inflates move lists and creates duplicate `PlacePiece` moves.
+See Resolved table.
 
 ---
 
@@ -95,6 +83,11 @@ Can trap bots in infinite loops.
 
 | #   | Finding                                         | Resolution                                    |
 | --- | ----------------------------------------------- | --------------------------------------------- |
+| 1   | No move validation in `makeMove`                | By design — client picks from server-provided valid move set, so moves are validated by construction. Lightweight tamper check belongs in Phase 2 service layer, not the engine |
+| 2   | Mutable internals exposed through getters       | Fixed — `getHand()`, `getPieceLocations()`, `getGrid()` now return `Collections.unmodifiable` wrappers |
+| 3   | `PlayerController` couples I/O to game logic    | Phase 2 concern — `GameRunner`/`PlayerController` are console artifacts, replaced by REST request/response. See `design/rest-api-architecture.md` |
+| 4   | `checkWinCondition` can reset finished game      | Fixed — early return guard when state is not `IN_PROGRESS` |
+| 5   | `getValidPlacementPositions` returns duplicates  | Fixed — `.stream().distinct()` deduplication added |
 | —   | `HivePiece` has no `equals`/`hashCode`          | Added per-type index and value-based equality |
 | —   | `isPieceMovable` doesn't handle stacked pieces  | Fixed — stack size check added                |
 | —   | Queen-by-turn-4 uses `== 4`, not `>= 4`         | Fixed to `>= 4`                               |
@@ -110,10 +103,10 @@ Can trap bots in infinite loops.
 
 | #   | Fix                                              | Why                           |
 | --- | ------------------------------------------------ | ----------------------------- |
-| 1   | Add move validation to `makeMove`                | REST receives untrusted input |
-| 2   | Fix `getValidPlacementPositions` duplicates      | Inflates move lists           |
-| 3   | Return unmodifiable collections from getters     | Prevent mutation              |
-| 4   | `checkWinCondition` — don't reset finished games | State integrity               |
+| ~~1~~   | ~~Add move validation to `makeMove`~~        | Resolved — validated by construction |
+| ~~2~~   | ~~Return unmodifiable collections from getters~~ | Resolved — wrapped with `Collections.unmodifiable` |
+| ~~3~~   | ~~Fix `getValidPlacementPositions` duplicates~~ | Resolved — `.distinct()` deduplication |
+| ~~4~~   | ~~`checkWinCondition` — don't reset finished games~~ | Resolved — early return guard |
 | 5   | Add domain exception hierarchy                   | Proper HTTP error mapping     |
 | 6   | Replace `System.out.println` with SLF4J          | Production logging            |
 
