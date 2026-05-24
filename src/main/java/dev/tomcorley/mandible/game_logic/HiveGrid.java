@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Queue;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class HiveGrid {
     private final Map<HexCoordinate, Deque<HivePiece>> grid;
@@ -111,6 +112,11 @@ public class HiveGrid {
             return false;
         }
 
+        // If the coordinate has a stack with more than one piece, it is movable
+        if (grid.get(coordinate).size() > 1) {
+            return true;
+        }
+
         // Form a set of all other occupied coordinates
         Set<HexCoordinate> occupiedCoordinates = new HashSet<>(grid.keySet());
         occupiedCoordinates.remove(coordinate);
@@ -160,7 +166,7 @@ public class HiveGrid {
         List<HexCoordinate> positions = new ArrayList<>();
 
         // If the grid is empty, we must place the first piece at the origin
-        if (grid.keySet().size() == 0) {
+        if (grid.keySet().isEmpty()) {
             positions.add(new HexCoordinate(0, 0));
             return positions;
         }
@@ -198,6 +204,9 @@ public class HiveGrid {
                 }
             }
         }
+
+        // Remove duplicates
+        positions = positions.stream().distinct().collect(Collectors.toList());
 
         return positions;
     }
