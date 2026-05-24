@@ -22,8 +22,7 @@ public class HiveBoard {
         } else if (move instanceof MovePiece moveMove) {
             movePiece(moveMove);
         } else {
-            System.out.println("Somehow passed neither a place piece nor a move piece");
-            throw new IllegalArgumentException("Invalid move");
+            throw new InvalidMoveException("Invalid move type: " + move.getClass().getSimpleName());
         }
     }
 

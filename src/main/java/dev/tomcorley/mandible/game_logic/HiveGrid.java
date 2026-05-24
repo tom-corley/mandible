@@ -63,7 +63,7 @@ public class HiveGrid {
 
         // Validate that the coordinate is free
         if (grid.containsKey(coordinate)) {
-            throw new IllegalArgumentException("Coordinate already occupied");
+            throw new InvalidMoveException("Coordinate already occupied");
         }
 
         Deque<HivePiece> stack = new ArrayDeque<>();
@@ -76,7 +76,7 @@ public class HiveGrid {
         HexCoordinate coordinate = move.position();
 
         if (!grid.containsKey(coordinate)) {
-            throw new IllegalArgumentException("Coordinate not occupied");
+            throw new InvalidMoveException("Coordinate not occupied");
         }
 
         grid.get(coordinate).pop();
@@ -88,7 +88,7 @@ public class HiveGrid {
     public void removePiece(HexCoordinate coordinate) {
         // TODO: deprecate this and use above
         if (!grid.containsKey(coordinate)) {
-            throw new IllegalArgumentException("Coordinate not occupied");
+            throw new InvalidMoveException("Coordinate not occupied");
         }
 
         grid.get(coordinate).pop();
@@ -120,7 +120,7 @@ public class HiveGrid {
         // Validate move
         if (!isValidMove(move)) {
             System.out.println("Validation failed at some point for move: " + move);
-            throw new IllegalArgumentException("Invalid move");
+            throw new InvalidMoveException("Invalid move");
         }
 
         // Pop piece to move from stack

@@ -57,7 +57,7 @@ class HiveGridTest {
         @DisplayName("placing on occupied coordinate throws")
         void placeOnOccupiedThrows() {
             place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(InvalidMoveException.class,
                     () -> place(blackPiece(HivePieceType.ANT), ORIGIN));
         }
 
@@ -101,7 +101,7 @@ class HiveGridTest {
         @Test
         @DisplayName("removing from empty coordinate throws")
         void removeFromEmptyThrows() {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(InvalidMoveException.class,
                     () -> grid.removePiece(ORIGIN));
         }
 
@@ -150,7 +150,7 @@ class HiveGridTest {
         @Test
         @DisplayName("moving from empty coordinate throws")
         void moveFromEmptyThrows() {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(InvalidMoveException.class,
                     () -> grid.movePiece(new MovePiece(ORIGIN, new HexCoordinate(1, 0))));
         }
 
