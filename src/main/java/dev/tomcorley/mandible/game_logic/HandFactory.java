@@ -10,25 +10,27 @@ public class HandFactory {
         List<HivePiece> hand = new ArrayList<>();
 
         // 1 Queen Bee
-        hand.add(new HivePiece(colour, HivePieceType.QUEEN_BEE));
+        hand.add(new HivePiece(colour, HivePieceType.QUEEN_BEE, 1));
 
         // 3 Ants
-        hand.add(new HivePiece(colour, HivePieceType.ANT));
-        hand.add(new HivePiece(colour, HivePieceType.ANT));
-        hand.add(new HivePiece(colour, HivePieceType.ANT));
-        
+        for (int i = 1; i <= 3; i++) {
+            hand.add(new HivePiece(colour, HivePieceType.ANT, i));
+        }
+
         // 3 Grasshoppers
-        hand.add(new HivePiece(colour, HivePieceType.GRASSHOPPER));
-        hand.add(new HivePiece(colour, HivePieceType.GRASSHOPPER));
-        hand.add(new HivePiece(colour, HivePieceType.GRASSHOPPER));
+        for (int i = 1; i <= 3; i++) {
+            hand.add(new HivePiece(colour, HivePieceType.GRASSHOPPER, i));
+        }
 
         // 2 Spiders
-        hand.add(new HivePiece(colour, HivePieceType.SPIDER));
-        hand.add(new HivePiece(colour, HivePieceType.SPIDER));
+        for (int i = 1; i <= 2; i++) {
+            hand.add(new HivePiece(colour, HivePieceType.SPIDER, i));
+        }
 
         // 2 Beetles
-        hand.add(new HivePiece(colour, HivePieceType.BEETLE));
-        hand.add(new HivePiece(colour, HivePieceType.BEETLE));
+        for (int i = 1; i <= 2; i++) {
+            hand.add(new HivePiece(colour, HivePieceType.BEETLE, i));
+        }
 
         return hand;
     }
@@ -37,13 +39,13 @@ public class HandFactory {
         List<HivePiece> hand = createStandardHand(colour);
 
         // 1 Ladybug
-        hand.add(new HivePiece(colour, HivePieceType.LADYBUG));
+        hand.add(new HivePiece(colour, HivePieceType.LADYBUG, 1));
 
         // 1 Mosquito
-        hand.add(new HivePiece(colour, HivePieceType.MOSQUITO));
+        hand.add(new HivePiece(colour, HivePieceType.MOSQUITO, 1));
 
         // 1 Pillbug
-        hand.add(new HivePiece(colour, HivePieceType.PILLBUG));
+        hand.add(new HivePiece(colour, HivePieceType.PILLBUG, 1));
 
         return hand;
     }

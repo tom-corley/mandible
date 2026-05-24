@@ -1,6 +1,7 @@
 package dev.tomcorley.mandible.game_logic.movement;
 
 import dev.tomcorley.mandible.game_logic.*;
+import dev.tomcorley.mandible.game_logic.TestPieceFactory;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,17 +20,20 @@ class SpiderMovementTest {
         grid.placePiece(new PlacePiece(coord, piece));
     }
 
+    private final TestPieceFactory pieces = new TestPieceFactory();
+
     private HivePiece white(HivePieceType type) {
-        return new HivePiece(PlayerColour.WHITE, type);
+        return pieces.white(type);
     }
 
     private HivePiece black(HivePieceType type) {
-        return new HivePiece(PlayerColour.BLACK, type);
+        return pieces.black(type);
     }
 
     @BeforeEach
     void setUp() {
         grid = new HiveGrid();
+        pieces.reset();
     }
 
     @Test

@@ -100,7 +100,7 @@ public class HiveGame {
 
         // If it is the fourth turn and they have not placed the queen they must do so
         HivePiece queen = player.getQueenBee();
-        if (!board.isPiecePlaced(queen) && this.turnCount == 4) {
+        if (!board.isPiecePlaced(queen) && this.turnCount >= 4) {
             unplacedPieces = List.of(queen);
         }
 

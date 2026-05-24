@@ -12,15 +12,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class HiveGridTest {
 
     private HiveGrid grid;
+    private final TestPieceFactory pieces = new TestPieceFactory();
 
     private static final HexCoordinate ORIGIN = new HexCoordinate(0, 0);
 
     private HivePiece whitePiece(HivePieceType type) {
-        return new HivePiece(PlayerColour.WHITE, type);
+        return pieces.white(type);
     }
 
     private HivePiece blackPiece(HivePieceType type) {
-        return new HivePiece(PlayerColour.BLACK, type);
+        return pieces.black(type);
     }
 
     private void place(HivePiece piece, HexCoordinate coord) {
@@ -30,6 +31,7 @@ class HiveGridTest {
     @BeforeEach
     void setUp() {
         grid = new HiveGrid();
+        pieces.reset();
     }
 
     // --- Placement ---
@@ -257,7 +259,7 @@ class HiveGridTest {
         void longLineOnlyEndsMovable() {
             for (int i = 0; i < 5; i++) {
                 PlayerColour colour = (i % 2 == 0) ? PlayerColour.WHITE : PlayerColour.BLACK;
-                place(new HivePiece(colour, HivePieceType.ANT), new HexCoordinate(i, 0));
+                place(new HivePiece(colour, HivePieceType.ANT, i + 1), new HexCoordinate(i, 0));
             }
 
             assertTrue(grid.isPieceMovable(new HexCoordinate(0, 0)));

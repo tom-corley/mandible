@@ -12,18 +12,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class HiveBoardTest {
 
     private HiveBoard board;
+    private final TestPieceFactory pieces = new TestPieceFactory();
 
     private HivePiece white(HivePieceType type) {
-        return new HivePiece(PlayerColour.WHITE, type);
+        return pieces.white(type);
     }
 
     private HivePiece black(HivePieceType type) {
-        return new HivePiece(PlayerColour.BLACK, type);
+        return pieces.black(type);
     }
 
     @BeforeEach
     void setUp() {
         board = new HiveBoard();
+        pieces.reset();
     }
 
     // --- makeMove dispatch ---
@@ -102,8 +104,8 @@ class HiveBoardTest {
         @Test
         @DisplayName("different piece instance of same type is not considered placed")
         void differentInstanceNotPlaced() {
-            HivePiece queen1 = white(HivePieceType.QUEEN_BEE);
-            HivePiece queen2 = white(HivePieceType.QUEEN_BEE);
+            HivePiece queen1 = new HivePiece(PlayerColour.WHITE, HivePieceType.QUEEN_BEE, 1);
+            HivePiece queen2 = new HivePiece(PlayerColour.WHITE, HivePieceType.QUEEN_BEE, 2);
 
             board.makeMove(new PlacePiece(new HexCoordinate(0, 0), queen1));
 
