@@ -1,8 +1,8 @@
 package dev.tomcorley.mandible.game_logic;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 public class HiveGame {
     private final HiveBoard board;
@@ -10,6 +10,7 @@ public class HiveGame {
     private final Player blackPlayer;
     private Player currentPlayer;
     private HiveGameState state;
+    private int turnCount;
 
     public HiveGame(Player whitePlayer, Player blackPlayer) {
         this.board = new HiveBoard();
@@ -17,6 +18,7 @@ public class HiveGame {
         this.blackPlayer = blackPlayer;
         this.currentPlayer = whitePlayer;
         this.state = HiveGameState.IN_PROGRESS;
+        this.turnCount = 1;
     }
 
     public void checkWinCondition() {
@@ -73,9 +75,12 @@ public class HiveGame {
         
         if (move == null) {
             System.out.println("No Possible Moves, Skipping Player's Turn");
-            return;
         } else {
             makeMove(move);
+        }
+
+        if (currentPlayer == blackPlayer) {
+            this.turnCount += 1;
         }
 
         this.currentPlayer = 
@@ -93,6 +98,13 @@ public class HiveGame {
             .filter(piece -> !board.isPiecePlaced(piece))
             .collect(Collectors.toList());
 
+        // If it is the fourth turn and they have not placed the queen they must do so
+        HivePiece queen = player.getQueenBee();
+        if (!board.isPiecePlaced(queen) && this.turnCount == 4) {
+            unplacedPieces = List.of(queen);
+        }
+
+
         // Combine the pieces and coordinates to create placement moves
         List<PlacePiece> placementMoves = new ArrayList<>();
         for (HivePiece piece : unplacedPieces) {
@@ -107,6 +119,12 @@ public class HiveGame {
     public List<MovePiece> getValidMoveMoves(Player player) {
         List<MovePiece> moves = new ArrayList<>();
         List<HivePiece> playerPieces = player.getHand();
+
+        // If queen has been placed yet cannot move any pieces
+        HivePiece queen = player.getQueenBee();
+        if (!board.isPiecePlaced(queen)) {
+            return moves;
+        }
 
         for (HivePiece piece : playerPieces) {
             List<MovePiece> pieceMoves = board.getValidMovesForPiece(piece);
