@@ -9,10 +9,14 @@ public class Player {
     private final List<HivePiece> hand;
 
     public Player(PlayerColour colour, String username, PlayerController controller) {
+        this(colour, username, controller, HandFactory.createStandardHand(colour));
+    }
+
+    public Player(PlayerColour colour, String username, PlayerController controller, List<HivePiece> hand) {
         this.colour = colour;
         this.username = username;
         this.controller = controller;
-        this.hand = HandFactory.createStandardHand(colour);
+        this.hand = hand;
     }
 
     public PlayerColour getColour() {

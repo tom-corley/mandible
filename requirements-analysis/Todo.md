@@ -8,6 +8,11 @@ We currently have mostly working game logic, well separated out and using patter
     - Turn advancement
     - Basically all classes
 
+- Some notion of evaluating the strength of a move
+    - pinning (hierachy here?)
+    - piece around queen
+    - beetle climbing is good, especially on queen
+
 - Moving to a Spring Boot app
     - What is the persistence layer on the app, db etc, docker for now probs
     - How do we serve all of the possible moves efficiently to a user

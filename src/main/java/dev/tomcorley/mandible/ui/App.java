@@ -1,14 +1,17 @@
 package dev.tomcorley.mandible.ui;
 
-import dev.tomcorley.mandible.game_logic.*;
-import javax.swing.*;
+import javax.swing.JFrame;
+
+import dev.tomcorley.mandible.game_logic.GameFactory;
+import dev.tomcorley.mandible.game_logic.HiveGame;
+import dev.tomcorley.mandible.game_logic.HiveGameState;
 
 public class App {
 
     private static final int TURN_DELAY_MS = 1000;
 
     public static void main(String[] args) {
-        HiveGame game = GameFactory.createStandardBotVsBotGame();
+        HiveGame game = GameFactory.createExpandedBotVsBotGame();
 
         BoardPanel panel = new BoardPanel(game);
         JFrame frame = new JFrame("Mandible");
