@@ -15,7 +15,7 @@ public class MosquitoMovement implements PieceMovementStrategy {
         List<MovePiece> moves = new ArrayList<>();
 
         // If mosquito is stacked, it must be a beetle
-        if (grid.getGrid().get(coordinate).size() > 1) {
+        if (grid.getStackHeight(coordinate) > 1) {
             PieceMovementStrategy beetleMovement = HivePieceType.BEETLE.getMovementStrategy();
             moves.addAll(beetleMovement.getValidMoves(coordinate, grid));
             return moves;
@@ -24,14 +24,14 @@ public class MosquitoMovement implements PieceMovementStrategy {
         // Otherwise, can move like a queen bee or any of its neigbouring pieces
         moves.addAll(HiveMovementUtils.slideAlongOneEdge(coordinate, grid));
         for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (grid.getGrid().containsKey(neighbour)) {
+            if (grid.isCoordinateOccupied(neighbour)) {
                 // Edge case for neigbouring mosquito
-                if (grid.getGrid().get(neighbour).peek().getType() == HivePieceType.MOSQUITO) {
+                if (grid.getStack(neighbour).peek().getType() == HivePieceType.MOSQUITO) {
                     continue;
                 }
 
                 // Get moves using the strategy of the neigbouring piece
-                PieceMovementStrategy neighbourStrategy = grid.getGrid().get(neighbour).peek().getType().getMovementStrategy();
+                PieceMovementStrategy neighbourStrategy = grid.getStack(neighbour).peek().getType().getMovementStrategy();
                 List<MovePiece> movesAsNeigbourType = neighbourStrategy.getValidMoves(coordinate, grid);
                 moves.addAll(movesAsNeigbourType);
             }

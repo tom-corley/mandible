@@ -94,7 +94,7 @@ public class HiveGame {
 
         // Check for 6 occupied neighbours 
         for (HexCoordinate neighbour : queenBeeCoordinate.getNeighbours()) {
-            if (!board.getGrid().isCoordinateOccupied(neighbour)) {
+            if (!board.isCoordinateOccupied(neighbour)) {
                 return false;
             }
         }

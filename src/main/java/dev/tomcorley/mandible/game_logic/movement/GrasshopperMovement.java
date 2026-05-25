@@ -17,13 +17,13 @@ public class GrasshopperMovement implements PieceMovementStrategy {
         for (HexDirection direction : HexDirection.values()) {
             HexCoordinate neighbour = coordinate.add(direction);
             // If there is no neighbour in that direction, skip
-            if (!grid.getGrid().containsKey(neighbour)) {
+            if (!grid.isCoordinateOccupied(neighbour)) {
                 continue;
             }
             
             // Continue moving in that direction until we hit a free space
             HexCoordinate destination = neighbour.add(direction);
-            while (grid.getGrid().containsKey(destination)) {
+            while (grid.isCoordinateOccupied(destination)) {
                 destination = destination.add(direction);
             }
 

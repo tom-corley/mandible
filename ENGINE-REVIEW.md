@@ -58,17 +58,17 @@ See Resolved table.
 
 See Resolved table.
 
-### 12. `slideAlongOneEdge` inconsistency
+### ~~12. `slideAlongOneEdge` inconsistency~~ — Not a bug
 
-Ant and spider remove the piece from the grid copy before checking; queen does not. Works by geometric coincidence, but inconsistent.
+See Resolved table.
 
 ### ~~13. No game ID~~ — Phase 2
 
 See Resolved table.
 
-### ~~14. No move history or undo~~ — Partially resolved
+### ~~14. No move history or undo~~ — Resolved
 
-See Resolved table for what's done. Draw-by-repetition deferred to Phase 2.
+See Resolved table.
 
 ---
 
@@ -87,8 +87,9 @@ See Resolved table for what's done. Draw-by-repetition deferred to Phase 2.
 | 9   | Pillbug last-moved locking                                  | Partially fixed — `lockedCoordinate` on `HiveGrid`, set on any `movePiece`, cleared each turn in `advanceTurn`. Covers both "can't move itself" and "can't be thrown". Gate check on throw still pending (TODO in `PillbugMovement.java`) |
 | 10  | `System.out.println` calls                                  | Fixed — replaced with SLF4J logging |
 | 11  | `HumanController` is a stub                                 | Phase 2 — replaced by REST request/response model |
+| 12  | `slideAlongOneEdge` inconsistency                           | Not a bug — ant/spider remove the piece before multi-step traversal because they need the grid to reflect mid-path positions; queen does not because a single-step move leaves the origin piece present, which is geometrically correct for gate and contact checks |
 | 13  | No game ID                                                  | Phase 2 — needed for multi-game REST support |
-| 14  | No move history or undo                                     | Partially fixed — `moveHistory` on `HiveGame`, `executeMove` records every move (including passes), `undoMove` reverses board state, player, and turn count. Draw-by-repetition deferred to Phase 2 |
+| 14  | No move history or undo                                     | Fixed — `moveHistory` on `HiveGame`, `executeMove` records every move (including passes), `undoMove` reverses board state, player, and turn count. Draw-by-repetition via `boardStateFrequencySet`: canonical board+player state key tracked each move, draw declared at third occurrence or after 5000 moves |
 | —   | `HivePiece` has no `equals`/`hashCode`                     | Fixed — per-type index and value-based equality added |
 | —   | `isPieceMovable` doesn't handle stacked pieces              | Fixed — stack size check added |
 | —   | Queen-by-turn-4 uses `== 4`, not `>= 4`                    | Fixed to `>= 4` |
@@ -103,5 +104,3 @@ See Resolved table for what's done. Draw-by-repetition deferred to Phase 2.
 | #   | Fix                                              | Why                                                                                 |
 | --- | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
 | 1   | Pillbug throw gate check (#9)                    | Correctness — freedom of movement not enforced on the two-step throw                |
-| 2   | `slideAlongOneEdge` inconsistency (#12)          | Correctness — piece removal before slide check is inconsistent across piece types   |
-| 3   | Draw-by-repetition (#14)                         | Phase 2 — prevents infinite bot loops, needed for event sourcing                    |

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import dev.tomcorley.mandible.game_logic.HexCoordinate;
+import dev.tomcorley.mandible.game_logic.HexDirection;
 import dev.tomcorley.mandible.game_logic.HiveGrid;
 import dev.tomcorley.mandible.game_logic.MovePiece;
 
@@ -25,28 +26,28 @@ public class PillbugMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidPillbugNeighbourMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        // Get list of neigbouring coordinates
-        List<HexCoordinate> neighbours = coordinate.getNeighbours();
-
-        // Get list of empty neighbouring coordinates
-        List<HexCoordinate> emptyNeighbours = neighbours.stream()
-            .filter(neighbour -> !grid.getGrid().containsKey(neighbour))
-            .collect(Collectors.toList());
-
-        // Get list of movable neighbouring coordinates
-        // Meaning, occupied by one unstacked piece that is movable
-        List<HexCoordinate> movableNeighbours = neighbours.stream()
-            .filter(neighbour -> grid.getGrid().containsKey(neighbour))
-            .filter(neighbour -> grid.getGrid().get(neighbour).size() == 1)
+        // Get list of directions
+        List<HexDirection> directions = List.of(HexDirection.values());
+        
+        // Get list of throwable neighbours
+        List<HexCoordinate> throwableNeighbours = directions.stream()
+            .filter(direction -> !grid.gateCheckAtHeight(coordinate, direction, 2))
+            .map(direction -> coordinate.add(direction))
+            .filter(neighbour -> grid.getStackHeight(neighbour) == 1)
             .filter(neighbour -> grid.isPieceMovable(neighbour))
             .collect(Collectors.toList());
 
-        // TODO: freedom of movement — gate check both the "up onto pillbug" and "down to empty space" steps
+        // Get list of valid throw destinations
+        List<HexCoordinate> throwDestinations = directions.stream()
+            .filter(direction -> !grid.gateCheckAtHeight(coordinate, direction, 2))
+            .map(direction -> coordinate.add(direction))
+            .filter(destination -> grid.getStackHeight(destination) == 0)
+            .collect(Collectors.toList());
 
         // Construct pairs of pieces to move and empty neighbouring coordinates
-        for (HexCoordinate movableNeighbour : movableNeighbours) {
-            for (HexCoordinate emptyNeighbour : emptyNeighbours) {
-                moves.add(new MovePiece(movableNeighbour, emptyNeighbour));
+        for (HexCoordinate throwableNeighbour : throwableNeighbours) {
+            for (HexCoordinate throwDestination : throwDestinations) {
+                moves.add(new MovePiece(throwableNeighbour, throwDestination));
             }
         }
 

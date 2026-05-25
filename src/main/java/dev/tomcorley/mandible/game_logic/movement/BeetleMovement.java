@@ -12,7 +12,7 @@ public class BeetleMovement implements PieceMovementStrategy {
     @Override
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
-        boolean hasClimbed = grid.getGrid().get(coordinate).size() > 1;
+        boolean hasClimbed = grid.getStackHeight(coordinate) > 1;
 
         // If the beetle has not climbed, it can edge move or climb up
         if (!hasClimbed) {
@@ -33,11 +33,11 @@ public class BeetleMovement implements PieceMovementStrategy {
     public static List<MovePiece> getValidClimbUpMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        // TODO: gate check for climb-up — a beetle should not be able to climb up through a gate
-
         // Can climb on to any occupied neighbouring space
-        for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (grid.isClimbUp(coordinate, neighbour)) {
+        for (HexDirection direction : HexDirection.values()) {
+            HexCoordinate neighbour = coordinate.add(direction);
+            int potentialGateHeight = grid.getStackHeight(neighbour) + 1;
+            if (grid.isClimbUp(coordinate, neighbour) && !grid.gateCheckAtHeight(coordinate, direction, potentialGateHeight)) {
                 moves.add(new MovePiece(coordinate, neighbour));
             }
         }
@@ -51,9 +51,8 @@ public class BeetleMovement implements PieceMovementStrategy {
         // Can climb across to any occupied neighbouring space
         for (HexDirection direction : HexDirection.values()) {
             HexCoordinate neighbour = coordinate.add(direction);
-            boolean isClimbAcross = grid.isClimbAcross(coordinate, neighbour);
 
-            if (!isClimbAcross || grid.gateCheck(coordinate, direction)) {
+            if (!grid.isClimbAcross(coordinate, neighbour) || grid.gateCheck(coordinate, direction)) {
                 continue;
             }
 
@@ -73,10 +72,13 @@ public class BeetleMovement implements PieceMovementStrategy {
         List<MovePiece> moves = new ArrayList<>();
 
         // Can climb down to any empty neighbouring space
-        for (HexCoordinate neighbour : coordinate.getNeighbours()) {
-            if (grid.isClimbDown(coordinate, neighbour)) {
-                moves.add(new MovePiece(coordinate, neighbour));
+        for (HexDirection direction : HexDirection.values()) {
+            HexCoordinate neighbour = coordinate.add(direction);
+            if (!grid.isClimbDown(coordinate, neighbour) || grid.gateCheck(coordinate, direction)) {
+                continue;
             }
+
+            moves.add(new MovePiece(coordinate, neighbour));
         }
 
         return moves;

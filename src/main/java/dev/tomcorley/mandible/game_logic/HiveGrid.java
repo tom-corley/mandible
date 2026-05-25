@@ -45,6 +45,14 @@ public class HiveGrid {
         return grid.get(coordinate).size();
     }
 
+    public Deque<HivePiece> getStack(HexCoordinate coordinate) {
+        if (!grid.containsKey(coordinate)) {
+            return new ArrayDeque<>();
+        }
+
+        return grid.get(coordinate);
+    }
+
     public boolean isCoordinateOccupied(HexCoordinate coordinate) {
         return grid.containsKey(coordinate);
     }
@@ -55,6 +63,10 @@ public class HiveGrid {
 
     public boolean gateCheck(HexCoordinate coordinate, HexDirection direction) {
         int gateHeight = grid.get(coordinate).size();
+        return gateCheckAtHeight(coordinate, direction, gateHeight);
+    }
+
+    public boolean gateCheckAtHeight(HexCoordinate coordinate, HexDirection direction, int gateHeight) {
         HexCoordinate anticlockwiseNeighbour = coordinate.add(direction.antiClockwise());
         HexCoordinate clockwiseNeighbour = coordinate.add(direction.clockwise());
         boolean antiClockwiseGated = isCoordinateOccupied(anticlockwiseNeighbour) && getStackHeight(anticlockwiseNeighbour) >= gateHeight && getStackHeight(clockwiseNeighbour) >= gateHeight;

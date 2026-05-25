@@ -54,6 +54,14 @@ public class HiveBoard {
         grid.lockCoordinate(moveMove.to());
     }
 
+    public boolean isCoordinateOccupied(HexCoordinate coordinate) {
+        return grid.isCoordinateOccupied(coordinate);
+    }
+
+    public int getStackHeight(HexCoordinate coordinate) {
+        return grid.getStackHeight(coordinate);
+    }
+
     public List<MovePiece> getValidMovesForPiece(HivePiece piece) {
         List<MovePiece> moves = new ArrayList<>();
 
