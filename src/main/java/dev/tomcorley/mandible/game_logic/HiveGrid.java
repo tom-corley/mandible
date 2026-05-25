@@ -37,6 +37,10 @@ public class HiveGrid {
         this.lockedCoordinate = other.lockedCoordinate;
     }
 
+    public HiveGrid copy() {
+        return new HiveGrid(this);
+    }
+
     public int getStackHeight(HexCoordinate coordinate) {
         if (!grid.containsKey(coordinate)) {
             return 0;

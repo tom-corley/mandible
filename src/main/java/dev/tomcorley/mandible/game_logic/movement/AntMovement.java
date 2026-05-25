@@ -17,7 +17,7 @@ public class AntMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        HiveGrid gridCopy = new HiveGrid(grid);
+        HiveGrid gridCopy = grid.copy();
         gridCopy.removePiece(coordinate);
 
         // We need to essentially bfs from the ants position sliding along one edge at a time, keeping track of visited coordinates

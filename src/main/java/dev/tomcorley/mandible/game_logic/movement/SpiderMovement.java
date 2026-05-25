@@ -16,7 +16,7 @@ public class SpiderMovement implements PieceMovementStrategy {
     public List<MovePiece> getValidMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
 
-        HiveGrid gridCopy = new HiveGrid(grid);
+        HiveGrid gridCopy = grid.copy();
         gridCopy.removePiece(coordinate);
 
         // Set up path array and dfs stack

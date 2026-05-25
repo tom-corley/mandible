@@ -19,7 +19,7 @@ public class LadybugMovement implements PieceMovementStrategy {
 
         // 2. One beetle climb across or climb up move — must stay on top of the hive
         List<MovePiece> secondLadybugMoves = new ArrayList<>();
-        HiveGrid gridCopy = new HiveGrid(grid);
+        HiveGrid gridCopy = grid.copy();
         for (MovePiece firstMove : firstLadybugMoves) {
             gridCopy.movePiece(firstMove);
             secondLadybugMoves.addAll(BeetleMovement.getValidClimbAcrossAboveFloorMoves(firstMove.to(), gridCopy));
