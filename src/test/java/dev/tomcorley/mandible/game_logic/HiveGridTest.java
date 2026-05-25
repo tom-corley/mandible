@@ -559,6 +559,78 @@ class HiveGridTest {
         }
     }
 
+    // --- State key ---
+
+    @Nested
+    @DisplayName("toStateKey")
+    class StateKeyTests {
+
+        @Test
+        @DisplayName("same board state produces identical key")
+        void sameBoardSameKey() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            assertEquals(grid.toStateKey(), grid.toStateKey());
+        }
+
+        @Test
+        @DisplayName("moving a piece changes the key")
+        void movingPieceChangesKey() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            String before = grid.toStateKey();
+
+            grid.movePiece(new MovePiece(new HexCoordinate(1, 0), new HexCoordinate(0, 1)));
+
+            assertNotEquals(before, grid.toStateKey());
+        }
+
+        @Test
+        @DisplayName("different piece type at same position produces different key")
+        void differentPieceTypeDifferentKey() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            String withAnt = grid.toStateKey();
+
+            grid.removePiece(new HexCoordinate(1, 0));
+            place(blackPiece(HivePieceType.SPIDER), new HexCoordinate(1, 0));
+
+            assertNotEquals(withAnt, grid.toStateKey());
+        }
+
+        @Test
+        @DisplayName("locked coordinate is included in key")
+        void lockedCoordinateAffectsKey() {
+            place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
+            String unlocked = grid.toStateKey();
+
+            grid.lockCoordinate(ORIGIN);
+
+            assertNotEquals(unlocked, grid.toStateKey());
+        }
+
+        @Test
+        @DisplayName("stack contents matter — different pieces on top produce different keys")
+        void stackContentsMatter() {
+            // beetle on top of ant at origin
+            place(whitePiece(HivePieceType.ANT), ORIGIN);
+            place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
+            place(whitePiece(HivePieceType.BEETLE), new HexCoordinate(0, 1));
+            grid.movePiece(new MovePiece(new HexCoordinate(0, 1), ORIGIN));
+            String beetleOnTop = grid.toStateKey();
+
+            // spider on top of ant at origin
+            HiveGrid grid2 = new HiveGrid();
+            grid2.placePiece(new PlacePiece(ORIGIN, whitePiece(HivePieceType.ANT)));
+            grid2.placePiece(new PlacePiece(new HexCoordinate(1, 0), blackPiece(HivePieceType.ANT)));
+            grid2.placePiece(new PlacePiece(new HexCoordinate(0, 1), whitePiece(HivePieceType.SPIDER)));
+            grid2.movePiece(new MovePiece(new HexCoordinate(0, 1), ORIGIN));
+            String spiderOnTop = grid2.toStateKey();
+
+            assertNotEquals(beetleOnTop, spiderOnTop);
+        }
+    }
+
     // --- Copy constructor ---
 
     @Nested

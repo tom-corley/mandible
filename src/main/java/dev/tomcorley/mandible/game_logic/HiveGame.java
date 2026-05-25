@@ -74,9 +74,7 @@ public class HiveGame {
     }
 
     public boolean checkForDraw() {
-        // Check current state key does not have a frequency of 2
-        String stateKey = board.toStateKey();
-        if (boardStateFrequencySet.containsKey(stateKey) && boardStateFrequencySet.get(stateKey) >= 2) {
+        if (boardStateFrequencySet.containsKey(currentStateKey()) && boardStateFrequencySet.get(currentStateKey()) >= 3) {
             return true;
         }
 
@@ -150,6 +148,14 @@ public class HiveGame {
         return placementMoves;
     }
 
+    private Player nextPlayer() {
+        return currentPlayer == whitePlayer ? blackPlayer : whitePlayer;
+    }
+
+    private String currentStateKey() {
+        return board.toStateKey() + "|" + nextPlayer().getColour();
+    }
+
     public void executeMove(HiveMove move) {
         // Clear the locked coordinate set by the previous move
         board.clearLockedCoordinate();
@@ -161,8 +167,7 @@ public class HiveGame {
         }
 
         moveHistory.add(move);
-        String stateKey = board.toStateKey();
-        addBoardStateToFrequencySet(stateKey);
+        addBoardStateToFrequencySet(currentStateKey());
     }
 
     public void undoMove() {
@@ -171,8 +176,7 @@ public class HiveGame {
         }
 
         // Decrement the frequency of the current state key
-        String stateKey = board.toStateKey();
-        removeBoardStateFromFrequencySet(stateKey);
+        removeBoardStateFromFrequencySet(currentStateKey());
 
         // Undo the last move
         HiveMove lastMove = moveHistory.remove(moveHistory.size() - 1);

@@ -481,6 +481,53 @@ class HiveGameTest {
         }
     }
 
+    // --- Draw detection ---
+
+    @Nested
+    @DisplayName("draw detection")
+    class DrawDetectionTests {
+
+        @Test
+        @DisplayName("fresh game is not a draw")
+        void freshGameNotDraw() {
+            assertFalse(game.checkForDraw());
+        }
+
+        @Test
+        @DisplayName("same board state once is not a draw")
+        void sameStateOnceNotDraw() {
+            game.executeMove(null);
+            assertFalse(game.checkForDraw());
+        }
+
+        @Test
+        @DisplayName("same board state twice is not a draw")
+        void sameStateTwiceNotDraw() {
+            game.executeMove(null);
+            game.executeMove(null);
+            assertFalse(game.checkForDraw());
+        }
+
+        @Test
+        @DisplayName("same board state three times is a draw")
+        void sameStateThreeTimesDraw() {
+            game.executeMove(null);
+            game.executeMove(null);
+            game.executeMove(null);
+            assertTrue(game.checkForDraw());
+        }
+
+        @Test
+        @DisplayName("undo decrements state frequency — no false draw after undo and replay")
+        void undoDecrementsFrequency() {
+            game.executeMove(null);
+            game.executeMove(null); // seen twice
+            game.undoMove();        // back to once
+            game.executeMove(null); // back to twice — not a draw yet
+            assertFalse(game.checkForDraw());
+        }
+    }
+
     // --- Combined valid moves ---
 
     @Nested
