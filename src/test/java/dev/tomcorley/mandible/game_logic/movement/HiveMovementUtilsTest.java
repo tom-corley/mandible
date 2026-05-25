@@ -114,7 +114,6 @@ class HiveMovementUtilsTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));   // NE
 
             List<MovePiece> moves = HiveMovementUtils.slideAlongOneEdge(ORIGIN, grid);
-            List<HexCoordinate> dests = moves.stream().map(MovePiece::to).toList();
 
             // The position between N and NE is (1,1) — but to slide there from origin
             // the direction index matters. The key point: sliding N is blocked because

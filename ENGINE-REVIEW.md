@@ -42,9 +42,9 @@ See Resolved table.
 
 See Resolved table.
 
-### ~~9. Pillbug missing "last-moved" tracking~~ — Partially resolved
+### ~~9. Pillbug missing "last-moved" tracking~~ — Resolved
 
-See Resolved table for what's done. Remaining: freedom of movement gate check on throw (TODO in `PillbugMovement.java`).
+See Resolved table.
 
 ---
 
@@ -84,7 +84,7 @@ See Resolved table.
 | 6   | Beetle climb gate check and height logic                    | Fixed — height-aware gate check on climb-across, proper height comparisons on all climb types, `isClimbAcross` formula corrected, ladybug movement refactored |
 | 7   | `BotController` creates new `Random()` each call            | Fixed — `Random` stored as field on the controller |
 | 8   | No exception hierarchy                                      | Fixed — `HiveException` base with `InvalidMoveException` |
-| 9   | Pillbug last-moved locking                                  | Partially fixed — `lockedCoordinate` on `HiveGrid`, set on any `movePiece`, cleared each turn in `advanceTurn`. Covers both "can't move itself" and "can't be thrown". Gate check on throw still pending (TODO in `PillbugMovement.java`) |
+| 9   | Pillbug last-moved locking                                  | Fixed — `lockedCoordinate` on `HiveGrid`, set on any `movePiece`, cleared each turn in `advanceTurn`. Covers both "can't move itself" and "can't be thrown". Gate check on the two-step throw implemented in `PillbugMovement` via `gateCheckAtHeight` at height 2 for both the lift and drop paths |
 | 10  | `System.out.println` calls                                  | Fixed — replaced with SLF4J logging |
 | 11  | `HumanController` is a stub                                 | Phase 2 — replaced by REST request/response model |
 | 12  | `slideAlongOneEdge` inconsistency                           | Not a bug — ant/spider remove the piece before multi-step traversal because they need the grid to reflect mid-path positions; queen does not because a single-step move leaves the origin piece present, which is geometrically correct for gate and contact checks |
@@ -101,6 +101,4 @@ See Resolved table.
 
 ## Remaining work before Phase 2
 
-| #   | Fix                                              | Why                                                                                 |
-| --- | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
-| 1   | Pillbug throw gate check (#9)                    | Correctness — freedom of movement not enforced on the two-step throw                |
+None — all pre-Phase 2 engine correctness items resolved.

@@ -264,15 +264,6 @@ class HiveGameTest {
     @DisplayName("queen-by-turn-4 enforcement")
     class QueenByFourTests {
 
-        private HiveGame scriptedGame(List<HiveMove> whiteMoveList, List<HiveMove> blackMoveList) {
-            List<HiveMove> wMoves = new ArrayList<>(whiteMoveList);
-            List<HiveMove> bMoves = new ArrayList<>(blackMoveList);
-
-            Player w = new Player(PlayerColour.WHITE, "w", g -> wMoves.remove(0));
-            Player b = new Player(PlayerColour.BLACK, "b", g -> bMoves.remove(0));
-            return new HiveGame(w, b);
-        }
-
         @Test
         @DisplayName("on turn 4 without queen placed, only queen placements offered")
         void turn4ForcesQueen() {

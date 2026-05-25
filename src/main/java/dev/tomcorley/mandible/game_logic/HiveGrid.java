@@ -116,7 +116,6 @@ public class HiveGrid {
     }
 
     public void removePiece(HexCoordinate coordinate) {
-        // TODO: deprecate this and use above
         if (!grid.containsKey(coordinate)) {
             throw new InvalidMoveException("Coordinate not occupied");
         }

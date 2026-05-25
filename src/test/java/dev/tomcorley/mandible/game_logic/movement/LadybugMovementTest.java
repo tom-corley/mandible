@@ -181,7 +181,6 @@ class LadybugMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
         List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
-        List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Ladybug climbs up onto one piece, across to the other, down to an empty neighbour
         // All destinations must be adjacent to at least one of the two pieces
