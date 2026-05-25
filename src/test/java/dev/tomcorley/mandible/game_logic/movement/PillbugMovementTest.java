@@ -155,6 +155,83 @@ class PillbugMovementTest {
         }
 
         @Test
+        @DisplayName("thrown piece lands on an empty square")
+        void throwDestinationMustBeEmpty() {
+            // pillbug(0,0), ant(1,0), queen(0,1) — ant and queen are both movable.
+            // Every throw destination must be an unoccupied square.
+            place(white(HivePieceType.PILLBUG), ORIGIN);
+            place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+            place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
+
+            PillbugMovement pb = new PillbugMovement();
+            List<MovePiece> throws_ = pb.getValidPillbugNeighbourMoves(ORIGIN, grid);
+
+            assertFalse(throws_.isEmpty(), "Pillbug should generate at least one throw move");
+            for (MovePiece move : throws_) {
+                assertFalse(grid.isCoordinateOccupied(move.to()),
+                    "Throw destination " + move.to() + " must be an empty square");
+            }
+        }
+
+        @Test
+        @DisplayName("cannot throw a bridge piece even when other destinations exist")
+        void cannotThrowBridgePieceWhenDestinationsExist() {
+            // ant(1,0) is a bridge — it is the only connection to pillar ant(2,0).
+            // ant(0,1) is a free movable neighbour.
+            // Without the movability check on throwable sources, (1,0) would be throwable.
+            place(white(HivePieceType.PILLBUG), ORIGIN);
+            place(black(HivePieceType.ANT), new HexCoordinate(1, 0));  // bridge
+            place(black(HivePieceType.ANT), new HexCoordinate(2, 0));  // pillar
+            place(white(HivePieceType.ANT), new HexCoordinate(0, 1));  // free neighbour
+
+            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+
+            assertFalse(moves.stream().anyMatch(m -> m.from().equals(new HexCoordinate(1, 0))),
+                "Bridge piece at (1,0) must not be thrown by the pillbug");
+        }
+
+        @Test
+        @DisplayName("throw is blocked when both gate pieces reach height 2")
+        void throwBlockedByGate() {
+            // Pillbug at ORIGIN, ant at N to be thrown.
+            // Gate for the N path: NW and NE each at height 2 → travel height 2 <= gate 2 → BLOCKED.
+            place(white(HivePieceType.PILLBUG), ORIGIN);
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));   // piece to throw
+
+            // Build NW to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NW));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.NW)));
+
+            // Build NE to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NE));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.NE)));
+
+            PillbugMovement pb = new PillbugMovement();
+            List<MovePiece> moves = pb.getValidPillbugNeighbourMoves(ORIGIN, grid);
+
+            assertFalse(moves.stream().anyMatch(m -> m.from().equals(ORIGIN.add(HexDirection.N))),
+                "Piece at N cannot be thrown: NW and NE gate at height 2 blocks the lift path");
+        }
+
+        @Test
+        @DisplayName("throw is allowed when gate pieces are only height 1")
+        void throwAllowedWhenGateAtHeightOne() {
+            // Gate (NW and NE) at height 1 only — travel height 2 > gate 1 → allowed.
+            place(white(HivePieceType.PILLBUG), ORIGIN);
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));   // piece to throw
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NW));  // gate, height 1
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NE));  // gate, height 1
+
+            PillbugMovement pb = new PillbugMovement();
+            List<MovePiece> moves = pb.getValidPillbugNeighbourMoves(ORIGIN, grid);
+
+            assertTrue(moves.stream().anyMatch(m -> m.from().equals(ORIGIN.add(HexDirection.N))),
+                "Piece at N can be thrown: NW and NE gate at height 1 does not block travel height 2");
+        }
+
+        @Test
         @DisplayName("pillbug moves include both own slides and neighbour moves")
         void combinesBothMoveTypes() {
             place(white(HivePieceType.PILLBUG), ORIGIN);

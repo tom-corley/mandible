@@ -64,6 +64,7 @@ public class BeetleMovement implements PieceMovementStrategy {
 
     public static List<MovePiece> getValidClimbAcrossAboveFloorMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = getValidClimbAcrossMoves(coordinate, grid);
+        moves.removeIf(move -> grid.getStackHeight(move.from()) == 0);
         moves.removeIf(move -> grid.getStackHeight(move.to()) == 0);
         return moves;
     }

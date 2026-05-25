@@ -234,9 +234,10 @@ class BeetleMovementTest {
         }
 
         @Test
-        @DisplayName("climb-up does not require gate check")
-        void climbUpIgnoresGate() {
-            // Beetle at origin, with occupied N and SE forming what would be a gate for NE
+        @DisplayName("climb-up allowed when gate height is below travel height")
+        void climbUpAllowedWhenGateBelowTravelHeight() {
+            // Gate (N and SE) at height 1. Beetle (x=1) climbing to NE (z=1): travel height = 2.
+            // Gate 1 < travel 2 → allowed.
             place(white(HivePieceType.BEETLE), ORIGIN);
             place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
             place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
@@ -245,14 +246,41 @@ class BeetleMovementTest {
             List<MovePiece> climbUps = BeetleMovement.getValidClimbUpMoves(ORIGIN, grid);
             List<HexCoordinate> destinations = climbUps.stream().map(MovePiece::to).toList();
 
-            // NE is a valid climb-up target despite the "gate"
             assertTrue(destinations.contains(ORIGIN.add(HexDirection.NE)));
         }
 
         @Test
-        @DisplayName("climb-down to empty spaces does not require gate check")
-        void climbDownIgnoresGate() {
-            // Beetle on a stack, flanking pieces that would form a gate
+        @DisplayName("climb-up blocked when gate height equals travel height")
+        void climbUpBlockedByGate() {
+            // Beetle at ORIGIN (x=1), NE neighbor at height 1 → travel height = max(1,2) = 2.
+            // Gate: N and SE each at height 2. Gate 2 >= travel 2 → BLOCKED.
+            place(white(HivePieceType.BEETLE), ORIGIN);
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.NE));  // climb target
+
+            // Build N to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.N)));
+
+            // Build SE to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.SE)));
+
+            List<MovePiece> moves = BeetleMovement.getValidClimbUpMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+            assertFalse(destinations.contains(ORIGIN.add(HexDirection.NE)),
+                "Climb-up to NE must be blocked: N and SE gate at height 2 equals travel height 2");
+            // Climbing to N (travel height 3) still allowed — different gate pieces
+            assertTrue(destinations.contains(ORIGIN.add(HexDirection.N)));
+        }
+
+        @Test
+        @DisplayName("climb-down allowed when gate height is below origin height")
+        void climbDownAllowedWhenGateBelowOriginHeight() {
+            // Gate (N and SE) at height 1. Beetle (x=2) descending to empty NE: travel height = 2.
+            // Gate 1 < travel 2 → allowed.
             place(black(HivePieceType.ANT), ORIGIN);
             place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
             place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(-1, 0));
@@ -261,12 +289,40 @@ class BeetleMovementTest {
 
             place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
             place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
-            // N and SE would gate NE for sliding, but climb-down ignores gates
 
             List<MovePiece> climbDowns = BeetleMovement.getValidClimbDownMoves(ORIGIN, grid);
             List<HexCoordinate> destinations = climbDowns.stream().map(MovePiece::to).toList();
 
             assertTrue(destinations.contains(ORIGIN.add(HexDirection.NE)));
+        }
+
+        @Test
+        @DisplayName("climb-down blocked when gate height equals origin height")
+        void climbDownBlockedByGate() {
+            // Beetle at ORIGIN (x=2), NE empty → travel height = max(2,1) = 2.
+            // Gate: N and SE each at height 2. Gate 2 >= travel 2 → BLOCKED.
+            place(black(HivePieceType.ANT), ORIGIN);
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN));  // ORIGIN: height 2
+
+            // Build N to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.N));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.N)));
+
+            // Build SE to height 2
+            place(black(HivePieceType.ANT), ORIGIN.add(HexDirection.SE));
+            place(white(HivePieceType.BEETLE), new HexCoordinate(2, 0));
+            grid.movePiece(new MovePiece(new HexCoordinate(2, 0), ORIGIN.add(HexDirection.SE)));
+
+            // NE is empty. NW is also empty and has no height-2 gate.
+            List<MovePiece> moves = BeetleMovement.getValidClimbDownMoves(ORIGIN, grid);
+            List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+            assertFalse(destinations.contains(ORIGIN.add(HexDirection.NE)),
+                "Climb-down to NE must be blocked: N and SE gate at height 2 equals origin height 2");
+            assertTrue(destinations.contains(ORIGIN.add(HexDirection.NW)),
+                "Climb-down to NW is allowed: no height-2 gate in that direction");
         }
 
         @Test
