@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.List;
 import java.util.ArrayList;
 
-public class HexCoordinate {
+public class HexCoordinate implements Comparable<HexCoordinate> {
     private final int q;
     private final int r;
 
@@ -66,5 +66,13 @@ public class HexCoordinate {
     @Override
     public String toString() {
         return "HexCoordinate(q=" + q + ", r=" + r + ")";
+    }
+
+    @Override 
+    public int compareTo(HexCoordinate other) {
+        if (this.q == other.q) {
+            return Integer.compare(this.r, other.r);
+        }
+        return Integer.compare(this.q, other.q);
     }
 }

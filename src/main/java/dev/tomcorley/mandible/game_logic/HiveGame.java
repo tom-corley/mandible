@@ -3,6 +3,8 @@ package dev.tomcorley.mandible.game_logic;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ public class HiveGame {
     private HiveGameState state;
     private int turnCount;
     private final List<HiveMove> moveHistory;
+    private final Map<String, Integer> boardStateFrequencySet;
 
     public HiveGame(Player whitePlayer, Player blackPlayer) {
         this.board = new HiveBoard();
@@ -26,6 +29,18 @@ public class HiveGame {
         this.state = HiveGameState.IN_PROGRESS;
         this.turnCount = 1;
         this.moveHistory = new ArrayList<>();
+        this.boardStateFrequencySet = new HashMap<>();
+    }
+
+    public void addBoardStateToFrequencySet(String stateKey) {
+        boardStateFrequencySet.put(stateKey, boardStateFrequencySet.getOrDefault(stateKey, 0) + 1);
+    }
+
+    public void removeBoardStateFromFrequencySet(String stateKey) {
+        boardStateFrequencySet.put(stateKey, boardStateFrequencySet.getOrDefault(stateKey, 0) - 1);
+        if (boardStateFrequencySet.get(stateKey) == 0) {
+            boardStateFrequencySet.remove(stateKey);
+        }
     }
 
     public void checkWinCondition() {
@@ -37,7 +52,9 @@ public class HiveGame {
 
         boolean blackWon = checkForBlackWin();
 
-        if (whiteWon && blackWon) {
+        boolean draw = checkForDraw();
+
+        if (whiteWon && blackWon || draw) {
             state = HiveGameState.DRAW;
         } else if (whiteWon) {
             state = HiveGameState.WHITE_WON;
@@ -54,6 +71,16 @@ public class HiveGame {
 
     public boolean checkForBlackWin() {
         return isQueenSurrounded(whitePlayer);
+    }
+
+    public boolean checkForDraw() {
+        // Check current state key does not have a frequency of 2
+        String stateKey = board.toStateKey();
+        if (boardStateFrequencySet.containsKey(stateKey) && boardStateFrequencySet.get(stateKey) >= 2) {
+            return true;
+        }
+
+        return moveHistory.size() >= 5000;
     }
     
     public boolean isQueenSurrounded(Player player) {
@@ -134,12 +161,18 @@ public class HiveGame {
         }
 
         moveHistory.add(move);
+        String stateKey = board.toStateKey();
+        addBoardStateToFrequencySet(stateKey);
     }
 
     public void undoMove() {
         if (moveHistory.isEmpty()) {
             return;
         }
+
+        // Decrement the frequency of the current state key
+        String stateKey = board.toStateKey();
+        removeBoardStateFromFrequencySet(stateKey);
 
         // Undo the last move
         HiveMove lastMove = moveHistory.remove(moveHistory.size() - 1);

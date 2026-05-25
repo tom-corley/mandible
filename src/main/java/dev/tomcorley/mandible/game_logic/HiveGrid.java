@@ -333,4 +333,29 @@ public class HiveGrid {
 
         return positions;
     }
+
+    public String toStateKey() {
+        // Sorted list of coordinate keys to grid
+        List<HexCoordinate> coordinateKeys = new ArrayList<>(grid.keySet());
+        Collections.sort(coordinateKeys);
+
+        // Construct a string per coordinate key based on the stack at that coordinate
+        StringBuilder key = new StringBuilder();
+        for (HexCoordinate coordinate : coordinateKeys) {
+            key.append(coordinate.toString());
+
+            Deque<HivePiece> stack = grid.get(coordinate);
+            for (HivePiece piece : stack) {
+                key.append(piece.toString());
+            }
+
+            // Append a separator
+            key.append(";");
+        }
+
+        // Append the locked coordinate
+        key.append("lockedCoordinate=").append(lockedCoordinate == null ? "null" : lockedCoordinate.toString());
+
+        return key.toString();
+    }
 }

@@ -110,4 +110,8 @@ public class HiveBoard {
     public void clearLockedCoordinate() {
         grid.clearLockedCoordinate();
     }
+
+    public String toStateKey() {
+        return grid.toStateKey();
+    }
 }
