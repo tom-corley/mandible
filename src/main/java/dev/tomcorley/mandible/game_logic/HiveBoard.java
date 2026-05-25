@@ -21,6 +21,8 @@ public class HiveBoard {
             placePiece(placeMove);
         } else if (move instanceof MovePiece moveMove) {
             movePiece(moveMove);
+        } else if (move instanceof RemovePiece removeMove) {
+            removePiece(removeMove);
         } else {
             throw new InvalidMoveException("Invalid move type: " + move.getClass().getSimpleName());
         }
@@ -29,6 +31,12 @@ public class HiveBoard {
     private void placePiece(PlacePiece placeMove) {
         grid.placePiece(placeMove);
         pieceLocations.put(placeMove.piece(), placeMove.position());
+    }
+
+    private void removePiece(RemovePiece removeMove) {
+        HivePiece piece = grid.getPiece(removeMove.position());
+        grid.removePiece(removeMove);
+        pieceLocations.remove(piece);
     }
 
     private void movePiece(MovePiece moveMove) {
@@ -41,6 +49,9 @@ public class HiveBoard {
 
         // Update piece location on board
         pieceLocations.put(piece, moveMove.to());
+
+        // Lock the destination coordinate
+        grid.lockCoordinate(moveMove.to());
     }
 
     public List<MovePiece> getValidMovesForPiece(HivePiece piece) {
@@ -55,9 +66,14 @@ public class HiveBoard {
         }
 
         HexCoordinate coordinate = pieceLocations.get(piece);
+        
         moves.addAll(grid.getValidMovesForPiece(coordinate));
 
         return moves;
+    }
+
+    public void lockCoordinate(HexCoordinate coordinate) {
+        grid.lockCoordinate(coordinate);
     }
 
     public boolean isPiecePlaced(HivePiece piece) {
@@ -89,5 +105,9 @@ public class HiveBoard {
 
     public Map<HivePiece, HexCoordinate> getPieceLocations() {
         return Collections.unmodifiableMap(pieceLocations);
+    }
+
+    public void clearLockedCoordinate() {
+        grid.clearLockedCoordinate();
     }
 }

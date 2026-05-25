@@ -172,4 +172,49 @@ class PillbugMovementTest {
             assertTrue(hasNeighbourMove, "Should include neighbour-moving ability");
         }
     }
+
+    @Nested
+    @DisplayName("locking")
+    class LockingTests {
+
+        // pillbug(0,0), ant(1,0), queen(0,1) — ant is movable, board stays connected
+        private final HexCoordinate antCoord = new HexCoordinate(1, 0);
+
+        @BeforeEach
+        void setUpBoard() {
+            place(white(HivePieceType.PILLBUG), ORIGIN);
+            place(black(HivePieceType.ANT), antCoord);
+            place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
+        }
+
+        @Test
+        @DisplayName("locked piece cannot be thrown by pillbug")
+        void lockedNeighbourCannotBeThrown() {
+            grid.lockCoordinate(antCoord);
+
+            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            boolean canThrow = moves.stream().anyMatch(m -> m.from().equals(antCoord));
+            assertFalse(canThrow);
+        }
+
+        @Test
+        @DisplayName("locked piece cannot move itself")
+        void lockedPieceCannotMoveSelf() {
+            grid.lockCoordinate(antCoord);
+
+            List<MovePiece> moves = grid.getValidMovesForPiece(antCoord);
+            assertTrue(moves.isEmpty());
+        }
+
+        @Test
+        @DisplayName("lock clears — piece can be thrown again after lock is cleared")
+        void lockClears() {
+            grid.lockCoordinate(antCoord);
+            grid.clearLockedCoordinate();
+
+            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            boolean canThrow = moves.stream().anyMatch(m -> m.from().equals(antCoord));
+            assertTrue(canThrow);
+        }
+    }
 }

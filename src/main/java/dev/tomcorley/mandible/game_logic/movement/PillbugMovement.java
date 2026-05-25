@@ -41,6 +41,8 @@ public class PillbugMovement implements PieceMovementStrategy {
             .filter(neighbour -> grid.isPieceMovable(neighbour))
             .collect(Collectors.toList());
 
+        // TODO: freedom of movement — gate check both the "up onto pillbug" and "down to empty space" steps
+
         // Construct pairs of pieces to move and empty neighbouring coordinates
         for (HexCoordinate movableNeighbour : movableNeighbours) {
             for (HexCoordinate emptyNeighbour : emptyNeighbours) {

@@ -22,7 +22,7 @@ public class HiveMovementUtils {
             if (grid.getGrid().containsKey(neighbour)) {
                 continue;
             }
-
+    
             // If it is free, check if we can slide along one edge
             if (!canSlideAlongOneEdge(coordinate, i, grid)) {
                 continue;

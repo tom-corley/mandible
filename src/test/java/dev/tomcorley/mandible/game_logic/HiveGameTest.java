@@ -384,6 +384,103 @@ class HiveGameTest {
         }
     }
 
+    // --- Undo ---
+
+    @Nested
+    @DisplayName("undoMove")
+    class UndoTests {
+
+        @Test
+        @DisplayName("undo on empty history is a no-op")
+        void undoEmptyHistoryNoOp() {
+            assertDoesNotThrow(() -> game.undoMove());
+        }
+
+        @Test
+        @DisplayName("undo a placement removes the piece from the board")
+        void undoPlacementRemovesPiece() {
+            HivePiece queen = pieceFromHand(white, HivePieceType.QUEEN_BEE);
+            HexCoordinate coord = new HexCoordinate(0, 0);
+            game.executeMove(new PlacePiece(coord, queen));
+
+            game.undoMove();
+
+            assertFalse(game.getBoard().isPiecePlaced(queen));
+            assertFalse(game.getBoard().getGrid().isCoordinateOccupied(coord));
+            assertEquals(0, game.getMoveHistory().size());
+        }
+
+        @Test
+        @DisplayName("undo a move restores piece to source position")
+        void undoMoveRestoresPosition() {
+            HivePiece queen = pieceFromHand(white, HivePieceType.QUEEN_BEE);
+            HivePiece ant = pieceFromHand(black, HivePieceType.ANT);
+            HexCoordinate origin = new HexCoordinate(0, 0);
+            HexCoordinate adjacent = new HexCoordinate(1, 0);
+            HexCoordinate dest = new HexCoordinate(1, -1);
+
+            game.executeMove(new PlacePiece(origin, queen));
+            game.executeMove(new PlacePiece(adjacent, ant));
+            game.executeMove(new MovePiece(origin, dest));
+
+            game.undoMove();
+
+            assertEquals(origin, game.getBoard().getPieceLocations().get(queen));
+            assertTrue(game.getBoard().getGrid().isCoordinateOccupied(origin));
+            assertFalse(game.getBoard().getGrid().isCoordinateOccupied(dest));
+        }
+
+        @Test
+        @DisplayName("undo a pass leaves board state unchanged")
+        void undoPassLeavesBoardUnchanged() {
+            HivePiece queen = pieceFromHand(white, HivePieceType.QUEEN_BEE);
+            game.executeMove(new PlacePiece(new HexCoordinate(0, 0), queen));
+
+            game.executeMove(null);
+            game.undoMove();
+
+            assertTrue(game.getBoard().isPiecePlaced(queen));
+            assertEquals(1, game.getMoveHistory().size());
+        }
+
+        @Test
+        @DisplayName("undo restores currentPlayer to the player who made the last move")
+        void undoRestoresCurrentPlayer() {
+            assertEquals(white, game.getCurrentPlayer());
+            game.advanceTurn();
+            assertEquals(black, game.getCurrentPlayer());
+
+            game.undoMove();
+
+            assertEquals(white, game.getCurrentPlayer());
+        }
+
+        @Test
+        @DisplayName("undo restores pillbug lock to previous move's destination")
+        void undoRestoresPillbugLock() {
+            HivePiece queen = pieceFromHand(white, HivePieceType.QUEEN_BEE);
+            HivePiece ant = pieceFromHand(black, HivePieceType.ANT);
+            HivePiece spider = pieceFromHand(white, HivePieceType.SPIDER);
+
+            HexCoordinate qOrigin = new HexCoordinate(0, 0);
+            HexCoordinate aOrigin = new HexCoordinate(1, 0);
+            HexCoordinate sOrigin = new HexCoordinate(-1, 0);
+            HexCoordinate qDest = new HexCoordinate(1, -1);
+            HexCoordinate aDest = new HexCoordinate(0, 0);
+
+            game.executeMove(new PlacePiece(qOrigin, queen));
+            game.executeMove(new PlacePiece(aOrigin, ant));
+            game.executeMove(new PlacePiece(sOrigin, spider));
+            game.executeMove(new MovePiece(qOrigin, qDest));  // locks qDest
+            game.executeMove(new MovePiece(aOrigin, aDest));  // locks aDest, unlocks qDest
+
+            game.undoMove();
+
+            assertTrue(game.getBoard().getGrid().isCoordinateLocked(qDest));
+            assertFalse(game.getBoard().getGrid().isCoordinateLocked(aDest));
+        }
+    }
+
     // --- Combined valid moves ---
 
     @Nested

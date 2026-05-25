@@ -42,25 +42,9 @@ See Resolved table.
 
 See Resolved table.
 
-### 9. Pillbug missing "last-moved" tracking
+### ~~9. Pillbug missing "last-moved" tracking~~ — Partially resolved
 
-**File:** `PillbugMovement.java`
-
-More complex than initially scoped. The full official pillbug rules require:
-
-**Two "stun" effects (state tracking on `HiveGame`):**
-1. **Last-moved immunity:** A piece that moved last turn (any move) can't be grabbed by a pillbug this turn. Track as `lastMovedPiece`, cleared after one turn.
-2. **Pillbug-moved stun:** A piece moved by the pillbug's special ability can't move itself next turn — but CAN be moved by another pillbug. Track as `lastPillbuggedPiece`, cleared after one turn.
-
-**Validation in `PillbugMovement`:**
-3. Can only grab **ground-level** adjacent pieces (not stacked beetles/mosquitoes on the hive).
-4. One-hive rule applies — grabbing the piece must not split the hive.
-5. Freedom of movement applies to both the "up onto pillbug" and "down to empty space" steps.
-6. Pillbug can't use its ability if it is itself **covered** by a beetle/mosquito.
-
-**Move representation:**
-- Needs a new move type (e.g. `PillbugThrow`) to distinguish from regular `MovePiece`, so `makeMove` can set the stun fields.
-- The move is two steps: adjacent piece climbs onto pillbug, then slides down to an empty adjacent space of the pillbug.
+See Resolved table for what's done. Remaining: freedom of movement gate check on throw (TODO in `PillbugMovement.java`).
 
 ---
 
@@ -109,6 +93,7 @@ Can trap bots in infinite loops.
 | —   | Queen-by-turn-4 uses `== 4`, not `>= 4`         | Fixed to `>= 4`                               |
 | —   | Mosquito unconditionally gets queen-bee sliding | Not a bug — intended behaviour                |
 | —   | `pieceLocations` inconsistency with stacking    | Not a bug — non-injective mapping is by design |
+| 9   | Pillbug last-moved locking                      | Fixed — `lockedCoordinate` on `HiveGrid`, set on any `movePiece`, cleared each turn in `advanceTurn`. Covers both "can't move itself" and "can't be thrown". Gate check on throw still pending (TODO in `PillbugMovement`) |
 | —   | `EuclideanCoordinate` has no `equals`/`hashCode`/`toString` | Fixed — added                 |
 
 

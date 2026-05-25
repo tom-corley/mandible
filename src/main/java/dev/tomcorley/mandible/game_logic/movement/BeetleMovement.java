@@ -32,7 +32,9 @@ public class BeetleMovement implements PieceMovementStrategy {
 
     public static List<MovePiece> getValidClimbUpMoves(HexCoordinate coordinate, HiveGrid grid) {
         List<MovePiece> moves = new ArrayList<>();
-        
+
+        // TODO: gate check for climb-up — a beetle should not be able to climb up through a gate
+
         // Can climb on to any occupied neighbouring space
         for (HexCoordinate neighbour : coordinate.getNeighbours()) {
             if (grid.isClimbUp(coordinate, neighbour)) {

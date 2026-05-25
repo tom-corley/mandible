@@ -16,19 +16,25 @@ import java.util.Collections;
 
 public class HiveGrid {
     private final Map<HexCoordinate, Deque<HivePiece>> grid;
+    private HexCoordinate lockedCoordinate;
 
     public HiveGrid() {
         this.grid = new HashMap<>();
+        this.lockedCoordinate = null;
     }
 
     public HiveGrid(HiveGrid other) {
         this.grid = new HashMap<>();
+
+        // Copy a new stack for each coordinate
         for (Map.Entry<HexCoordinate, Deque<HivePiece>> entry : other.getGrid().entrySet()) {
             // Use the same coordinate, mapped to a copy of the stack, referencing the same pieces
             HexCoordinate coordinate = entry.getKey();
             Deque<HivePiece> stack = new ArrayDeque<>(entry.getValue());
             this.grid.put(coordinate, stack);
         }
+
+        this.lockedCoordinate = other.lockedCoordinate;
     }
 
     public int getStackHeight(HexCoordinate coordinate) {
@@ -43,6 +49,10 @@ public class HiveGrid {
         return grid.containsKey(coordinate);
     }
 
+    public boolean isCoordinateLocked(HexCoordinate coordinate) {
+        return lockedCoordinate != null && lockedCoordinate.equals(coordinate);
+    }
+
     public boolean gateCheck(HexCoordinate coordinate, HexDirection direction) {
         int gateHeight = grid.get(coordinate).size();
         HexCoordinate anticlockwiseNeighbour = coordinate.add(direction.antiClockwise());
@@ -51,6 +61,14 @@ public class HiveGrid {
         boolean clockwiseGated = isCoordinateOccupied(clockwiseNeighbour) && getStackHeight(clockwiseNeighbour) >= gateHeight && getStackHeight(anticlockwiseNeighbour) >= gateHeight;
             
         return antiClockwiseGated && clockwiseGated;
+    }
+
+    public void lockCoordinate(HexCoordinate coordinate) {
+        this.lockedCoordinate = coordinate;
+    }
+
+    public void clearLockedCoordinate() {
+        this.lockedCoordinate = null;
     }
 
     public Map<HexCoordinate, Deque<HivePiece>> getGrid() {
@@ -209,6 +227,11 @@ public class HiveGrid {
 
     public boolean isPieceMovable(HexCoordinate coordinate) {
         if (grid.keySet().size() == 1) {
+            return false;
+        }
+
+        // If the coordinate is locked, it is not movable
+        if (isCoordinateLocked(coordinate)) {
             return false;
         }
 

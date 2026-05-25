@@ -1,6 +1,7 @@
 package dev.tomcorley.mandible.game_logic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ public class HiveGame {
     private Player currentPlayer;
     private HiveGameState state;
     private int turnCount;
+    private final List<HiveMove> moveHistory;
 
     public HiveGame(Player whitePlayer, Player blackPlayer) {
         this.board = new HiveBoard();
@@ -23,6 +25,7 @@ public class HiveGame {
         this.currentPlayer = whitePlayer;
         this.state = HiveGameState.IN_PROGRESS;
         this.turnCount = 1;
+        this.moveHistory = new ArrayList<>();
     }
 
     public void checkWinCondition() {
@@ -80,12 +83,8 @@ public class HiveGame {
 
     public void advanceTurn() {
         HiveMove move = currentPlayer.getController().chooseMove(this);
-        
-        if (move == null) {
-            log.debug("No possible moves, skipping turn for {}", currentPlayer.getColour());
-        } else {
-            makeMove(move);
-        }
+
+        executeMove(move);
 
         if (currentPlayer == blackPlayer) {
             this.turnCount += 1;
@@ -122,6 +121,53 @@ public class HiveGame {
         }
 
         return placementMoves;
+    }
+
+    public void executeMove(HiveMove move) {
+        // Clear the locked coordinate set by the previous move
+        board.clearLockedCoordinate();
+
+        if (move == null) {
+            log.debug("No possible moves, skipping turn for {}", currentPlayer.getColour());
+        } else {
+            makeMove(move);
+        }
+
+        moveHistory.add(move);
+    }
+
+    public void undoMove() {
+        if (moveHistory.isEmpty()) {
+            return;
+        }
+
+        // Undo the last move
+        HiveMove lastMove = moveHistory.remove(moveHistory.size() - 1);
+        if (lastMove != null) {
+            HiveMove invertedMove = lastMove.invertMove();
+            board.makeMove(invertedMove);
+        }
+
+        // Restore the pillbug lock present before the last move
+        board.clearLockedCoordinate();
+        if (!moveHistory.isEmpty()) {
+            HiveMove penultimateMove = moveHistory.get(moveHistory.size() - 1);
+            if (penultimateMove instanceof MovePiece movePiece) {
+                board.lockCoordinate(movePiece.to());
+            }
+        }
+
+        // Switch to the other player
+        this.currentPlayer =
+          this.currentPlayer == whitePlayer
+            ? blackPlayer
+            : whitePlayer;
+
+
+        // Decrement the turn count if we have gone back to a black turn
+        if (this.currentPlayer == blackPlayer) {
+            this.turnCount -= 1;
+        }
     }
 
     public List<MovePiece> getValidMoveMoves(Player player) {
@@ -178,5 +224,9 @@ public class HiveGame {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public List<HiveMove> getMoveHistory() {
+        return Collections.unmodifiableList(moveHistory);
     }
 }
