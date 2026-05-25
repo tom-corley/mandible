@@ -109,6 +109,17 @@ class GrasshopperMovementTest {
     }
 
     @Test
+    @DisplayName("grasshopper that is a bridge has no moves")
+    void bridgeGrasshopperNoMoves() {
+        place(black(HivePieceType.ANT), new HexCoordinate(-1, 0));
+        place(white(HivePieceType.GRASSHOPPER), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        assertTrue(moves.isEmpty());
+    }
+
+    @Test
     @DisplayName("all grasshopper moves originate from current position")
     void allMovesOriginateFromCurrentPosition() {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);

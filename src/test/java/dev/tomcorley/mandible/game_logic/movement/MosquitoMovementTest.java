@@ -120,6 +120,57 @@ class MosquitoMovementTest {
     }
 
     @Test
+    @DisplayName("mosquito next to ant can reach far positions like an ant")
+    void canCopyAntMovement() {
+        // Mosquito at origin, ant at (1,0), anchor queen at (2,0).
+        // Copying ant gives BFS-reach to (3,0) and beyond — queen-only would give just 2 slides.
+        place(white(HivePieceType.MOSQUITO), ORIGIN);
+        place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
+        place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+        assertTrue(destinations.contains(new HexCoordinate(3, 0)),
+                "Mosquito copying ant should reach far end of chain at (3,0)");
+    }
+
+    @Test
+    @DisplayName("mosquito next to spider can reach 3-step positions")
+    void canCopySpiderMovement() {
+        // Linear chain: mosquito(0,0) — spider(1,0) — ant(2,0) — ant(3,0).
+        // Spider-copying gives 3-step destinations (2,1) and (3,-1); queen-only gives at most (0,1)/(1,-1).
+        place(white(HivePieceType.MOSQUITO), ORIGIN);
+        place(black(HivePieceType.SPIDER), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
+        place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
+
+        // Either 3-step arc destination confirms spider copying works
+        assertTrue(destinations.contains(new HexCoordinate(2, 1)) ||
+                   destinations.contains(new HexCoordinate(3, -1)),
+                "Mosquito copying spider should reach a 3-step position");
+    }
+
+    @Test
+    @DisplayName("mosquito next to pillbug can use pillbug's throw ability")
+    void canCopyPillbugAbility() {
+        // Triangle: mosquito(0,0), pillbug(1,0), ant(0,1).
+        // Mosquito copies pillbug → can throw the ant at (0,1) to an empty neighbour of itself.
+        place(white(HivePieceType.MOSQUITO), ORIGIN);
+        place(black(HivePieceType.PILLBUG), new HexCoordinate(1, 0));
+        place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
+
+        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+
+        boolean hasThrow = moves.stream()
+                .anyMatch(m -> m.from().equals(new HexCoordinate(0, 1)));
+        assertTrue(hasThrow, "Mosquito copying pillbug should be able to throw the ant at (0,1)");
+    }
+
+    @Test
     @DisplayName("mosquito alone on board has no moves")
     void mosquitoAloneNoMoves() {
         place(white(HivePieceType.MOSQUITO), ORIGIN);

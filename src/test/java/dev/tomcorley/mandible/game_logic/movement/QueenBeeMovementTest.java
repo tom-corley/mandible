@@ -75,6 +75,7 @@ class QueenBeeMovementTest {
         place(white(HivePieceType.QUEEN_BEE), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
+
         List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 

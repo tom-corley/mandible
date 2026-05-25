@@ -66,6 +66,19 @@ class HiveBoardTest {
         }
 
         @Test
+        @DisplayName("RemovePiece removes piece from grid and pieceLocations")
+        void removePieceUpdatesState() {
+            HivePiece queen = white(HivePieceType.QUEEN_BEE);
+            HexCoordinate coord = new HexCoordinate(0, 0);
+            board.makeMove(new PlacePiece(coord, queen));
+
+            board.makeMove(new RemovePiece(coord));
+
+            assertFalse(board.isPiecePlaced(queen));
+            assertFalse(board.getGrid().isCoordinateOccupied(coord));
+        }
+
+        @Test
         @DisplayName("placing multiple pieces tracks all of them")
         void tracksMultiplePieces() {
             HivePiece queen = white(HivePieceType.QUEEN_BEE);

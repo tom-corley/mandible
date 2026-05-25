@@ -156,6 +156,32 @@ class HiveGameTest {
         }
 
         @Test
+        @DisplayName("checkWinCondition does not reset a finished game back to IN_PROGRESS")
+        void finishedGameNotReset() {
+            placeAt(black, HivePieceType.QUEEN_BEE, new HexCoordinate(0, 0));
+            HexCoordinate[] neighbours = {
+                    new HexCoordinate(0, 1), new HexCoordinate(1, 0),
+                    new HexCoordinate(1, -1), new HexCoordinate(0, -1),
+                    new HexCoordinate(-1, 0), new HexCoordinate(-1, 1)
+            };
+            HivePieceType[] types = {
+                    HivePieceType.ANT, HivePieceType.ANT, HivePieceType.ANT,
+                    HivePieceType.SPIDER, HivePieceType.SPIDER, HivePieceType.GRASSHOPPER
+            };
+            for (int i = 0; i < 6; i++) {
+                Player placer = (i % 2 == 0) ? white : black;
+                placeAt(placer, types[i], neighbours[i]);
+            }
+
+            game.checkWinCondition();
+            assertEquals(HiveGameState.WHITE_WON, game.getState());
+
+            // Second call must not change the state even though the board hasn't changed
+            game.checkWinCondition();
+            assertEquals(HiveGameState.WHITE_WON, game.getState());
+        }
+
+        @Test
         @DisplayName("five of six neighbours occupied is not a win")
         void fiveNeighboursNotSurrounded() {
             placeAt(black, HivePieceType.QUEEN_BEE, new HexCoordinate(0, 0));
