@@ -2,13 +2,17 @@ package dev.tomcorley.mandible.ui;
 
 import javax.swing.JFrame;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dev.tomcorley.mandible.game_logic.GameFactory;
 import dev.tomcorley.mandible.game_logic.HiveGame;
 import dev.tomcorley.mandible.game_logic.HiveGameState;
 
 public class App {
+    private static final Logger log = LoggerFactory.getLogger(App.class);
 
-    private static final int TURN_DELAY_MS = 1000;
+    private static final int TURN_DELAY_MS = 10;
 
     public static void main(String[] args) {
         HiveGame game = GameFactory.createExpandedBotVsBotGame();
@@ -33,7 +37,7 @@ public class App {
                     break;
                 }
             }
-            System.out.println(game.getState());
+            log.info("Game finished: {}", game.getState());
         });
         gameThread.setDaemon(true);
         gameThread.start();

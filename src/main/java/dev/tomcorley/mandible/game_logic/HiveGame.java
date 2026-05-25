@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HiveGame {
+    private static final Logger log = LoggerFactory.getLogger(HiveGame.class);
     private final HiveBoard board;
     private final Player whitePlayer;
     private final Player blackPlayer;
@@ -78,7 +82,7 @@ public class HiveGame {
         HiveMove move = currentPlayer.getController().chooseMove(this);
         
         if (move == null) {
-            System.out.println("No Possible Moves, Skipping Player's Turn");
+            log.debug("No possible moves, skipping turn for {}", currentPlayer.getColour());
         } else {
             makeMove(move);
         }

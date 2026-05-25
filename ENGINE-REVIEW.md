@@ -46,27 +46,41 @@ See Resolved table.
 
 **File:** `PillbugMovement.java`
 
-The pillbug can't move a piece that was just moved on the previous turn (official Hive rule). No tracking for this exists.
+More complex than initially scoped. The full official pillbug rules require:
+
+**Two "stun" effects (state tracking on `HiveGame`):**
+1. **Last-moved immunity:** A piece that moved last turn (any move) can't be grabbed by a pillbug this turn. Track as `lastMovedPiece`, cleared after one turn.
+2. **Pillbug-moved stun:** A piece moved by the pillbug's special ability can't move itself next turn — but CAN be moved by another pillbug. Track as `lastPillbuggedPiece`, cleared after one turn.
+
+**Validation in `PillbugMovement`:**
+3. Can only grab **ground-level** adjacent pieces (not stacked beetles/mosquitoes on the hive).
+4. One-hive rule applies — grabbing the piece must not split the hive.
+5. Freedom of movement applies to both the "up onto pillbug" and "down to empty space" steps.
+6. Pillbug can't use its ability if it is itself **covered** by a beetle/mosquito.
+
+**Move representation:**
+- Needs a new move type (e.g. `PillbugThrow`) to distinguish from regular `MovePiece`, so `makeMove` can set the stun fields.
+- The move is two steps: adjacent piece climbs onto pillbug, then slides down to an empty adjacent space of the pillbug.
 
 ---
 
 ## Low
 
-### 10. `System.out.println` calls (12 instances)
+### ~~10. `System.out.println` calls (12 instances)~~ — Resolved
 
-Replace with SLF4J before Spring.
+See Resolved table.
 
-### 11. `HumanController` is a stub
+### ~~11. `HumanController` is a stub~~ — Phase 2
 
-Returns `null` (permanent turn-skip). Remove or implement before Phase 2.
+See Resolved table.
 
 ### 12. `slideAlongOneEdge` inconsistency
 
 Ant and spider remove the piece from the grid copy before checking; queen does not. Works by geometric coincidence, but inconsistent.
 
-### 13. No game ID
+### ~~13. No game ID~~ — Phase 2
 
-Needed for multi-game REST support.
+See Resolved table.
 
 ### 14. No move history, undo, or draw-by-repetition
 
@@ -86,7 +100,10 @@ Can trap bots in infinite loops.
 | 5   | `getValidPlacementPositions` returns duplicates  | Fixed — `.stream().distinct()` deduplication added |
 | 6   | Beetle climb gate check and height logic         | Fixed — height-aware gate check on climb-across, proper height comparisons on all climb types, `isClimbAcross` formula corrected, ladybug movement refactored |
 | 7   | `BotController` creates new `Random()` each call | Fixed — `Random` stored as field on the controller |
-| 8   | No exception hierarchy                           | Fixed — `HiveException` base with `InvalidMoveException` and `InvalidBoardStateException` |
+| 8   | No exception hierarchy                           | Fixed — `HiveException` base with `InvalidMoveException` |
+| 11  | `HumanController` is a stub                      | Phase 2 — replaced by REST request/response model |
+| 10  | `System.out.println` calls                       | Fixed — replaced with SLF4J logging |
+| 13  | No game ID                                       | Phase 2 — needed for multi-game REST support |
 | —   | `HivePiece` has no `equals`/`hashCode`          | Added per-type index and value-based equality |
 | —   | `isPieceMovable` doesn't handle stacked pieces  | Fixed — stack size check added                |
 | —   | Queen-by-turn-4 uses `== 4`, not `>= 4`         | Fixed to `>= 4`                               |
@@ -97,16 +114,14 @@ Can trap bots in infinite loops.
 
 ---
 
-## Recommended fix order before Phase 2
+## Remaining fix order before Phase 2
 
 
 | #   | Fix                                              | Why                           |
 | --- | ------------------------------------------------ | ----------------------------- |
-| ~~1~~   | ~~Add move validation to `makeMove`~~        | Resolved — validated by construction |
-| ~~2~~   | ~~Return unmodifiable collections from getters~~ | Resolved — wrapped with `Collections.unmodifiable` |
-| ~~3~~   | ~~Fix `getValidPlacementPositions` duplicates~~ | Resolved — `.distinct()` deduplication |
-| ~~4~~   | ~~`checkWinCondition` — don't reset finished games~~ | Resolved — early return guard |
-| 5   | Add domain exception hierarchy                   | Proper HTTP error mapping     |
-| 6   | Replace `System.out.println` with SLF4J          | Production logging            |
+| 1   | Pillbug special ability + stun tracking (#9)     | Correctness — missing game rule |
+| 2   | Replace `System.out.println` with SLF4J (#10)    | Production logging            |
+| 3   | `slideAlongOneEdge` inconsistency (#12)          | Correctness — piece removal before slide check is inconsistent across piece types |
+| 4   | Move history / draw-by-repetition (#14)          | Prevents infinite bot loops, needed for event sourcing in Phase 2 |
 
 

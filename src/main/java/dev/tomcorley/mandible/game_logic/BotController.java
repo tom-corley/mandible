@@ -3,7 +3,11 @@ package dev.tomcorley.mandible.game_logic;
 import java.util.List;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class BotController implements PlayerController {
+    private static final Logger log = LoggerFactory.getLogger(BotController.class);
     private final Random random;
 
     public BotController() {
@@ -23,16 +27,16 @@ public class BotController implements PlayerController {
         List<HiveMove> validMoves = game.getValidMovesForPlayer(player);
 
         // Maybe for now we just choose a random integer between 0 and the number of valid moves
-        System.out.println("Number of valid moves: " + validMoves.size());
+        log.debug("Valid moves: {}", validMoves.size());
 
         if (validMoves.isEmpty()) {
-            System.out.println("No valid moves found");
+            log.debug("No valid moves, skipping turn");
             return null;
         }
 
         int randomIndex = random.nextInt(validMoves.size());
         HiveMove chosenMove = validMoves.get(randomIndex);
-        System.out.println("Chosen move: " + chosenMove);
+        log.debug("Chosen move: {}", chosenMove);
         return chosenMove;
     }
 }

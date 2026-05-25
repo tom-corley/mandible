@@ -1,18 +1,17 @@
 package dev.tomcorley.mandible.game_logic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GameRunner {
+    private static final Logger log = LoggerFactory.getLogger(GameRunner.class);
+
     public void runGame(HiveGame game) {
         while (game.getState() == HiveGameState.IN_PROGRESS) {
             game.advanceTurn();
             game.checkWinCondition();
         }
 
-        if (game.getState() == HiveGameState.WHITE_WON) {
-            System.out.println("White won!");
-        } else if (game.getState() == HiveGameState.BLACK_WON) {
-            System.out.println("Black won!");
-        } else {
-            System.out.println("Draw!");
-        }
+        log.info("Game finished: {}", game.getState());
     }
 }

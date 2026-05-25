@@ -106,7 +106,6 @@ public class HiveGrid {
 
         // Validate piece to move exists
         if (!grid.containsKey(from)) {
-            System.out.println("From coordinate not occupied: " + from);
             return false;
         }
 
@@ -119,8 +118,7 @@ public class HiveGrid {
 
         // Validate move
         if (!isValidMove(move)) {
-            System.out.println("Validation failed at some point for move: " + move);
-            throw new InvalidMoveException("Invalid move");
+            throw new InvalidMoveException("Invalid move: " + move);
         }
 
         // Pop piece to move from stack
