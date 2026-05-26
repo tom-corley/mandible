@@ -1,6 +1,6 @@
 package dev.tomcorley.mandible.ui;
 
-import dev.tomcorley.mandible.game_logic.*;
+import dev.tomcorley.mandible.engine.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;

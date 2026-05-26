@@ -5,9 +5,9 @@ import javax.swing.JFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import dev.tomcorley.mandible.game_logic.GameFactory;
-import dev.tomcorley.mandible.game_logic.HiveGame;
-import dev.tomcorley.mandible.game_logic.HiveGameState;
+import dev.tomcorley.mandible.engine.GameFactory;
+import dev.tomcorley.mandible.engine.HiveGame;
+import dev.tomcorley.mandible.engine.HiveGameState;
 
 public class App {
     private static final Logger log = LoggerFactory.getLogger(App.class);
