@@ -35,6 +35,9 @@ build/
 ### Claude ###
 .claude/settings.*
 
+### Spring reference guides ###
+guides/
+
 ### Local config (secrets) ###
 application-local.yaml
 application-local.yml
