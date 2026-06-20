@@ -13,6 +13,8 @@ Main challenges:
 - How to do analytics on moves
 - Worth trying GraphQL protocol
 - Containerisation and Deployment?
+- Proper spring boot layering with filter chains, controllers, services and repositories
+- Sensible use of design patterns
 
 Think about a frontend later - It would be really nice to make a mobile app eventually, but we will see. Maybe just a web app, 
 
