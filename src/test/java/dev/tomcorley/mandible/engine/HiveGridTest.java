@@ -94,7 +94,7 @@ class HiveGridTest {
         @DisplayName("removing the only piece makes coordinate unoccupied")
         void removeLastPieceClearsCoordinate() {
             place(whitePiece(HivePieceType.ANT), ORIGIN);
-            grid.removePiece(ORIGIN);
+            grid.removePiece(new RemovePiece(ORIGIN));
             assertFalse(grid.isCoordinateOccupied(ORIGIN));
         }
 
@@ -102,7 +102,7 @@ class HiveGridTest {
         @DisplayName("removing from empty coordinate throws")
         void removeFromEmptyThrows() {
             assertThrows(InvalidMoveException.class,
-                    () -> grid.removePiece(ORIGIN));
+                    () -> grid.removePiece(new RemovePiece(ORIGIN)));
         }
 
         @Test
@@ -115,7 +115,7 @@ class HiveGridTest {
             grid.movePiece(new MovePiece(new HexCoordinate(1, 0), ORIGIN));
 
             assertSame(top, grid.getPiece(ORIGIN));
-            grid.removePiece(ORIGIN);
+            grid.removePiece(new RemovePiece(ORIGIN));
             assertSame(bottom, grid.getPiece(ORIGIN));
         }
     }
@@ -592,7 +592,7 @@ class HiveGridTest {
             place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
             String withAnt = grid.toStateKey();
 
-            grid.removePiece(new HexCoordinate(1, 0));
+            grid.removePiece(new RemovePiece(new HexCoordinate(1, 0)));
             place(blackPiece(HivePieceType.SPIDER), new HexCoordinate(1, 0));
 
             assertNotEquals(withAnt, grid.toStateKey());
@@ -660,7 +660,7 @@ class HiveGridTest {
             place(blackPiece(HivePieceType.ANT), new HexCoordinate(1, 0));
 
             HiveGrid copy = new HiveGrid(grid);
-            copy.removePiece(ORIGIN);
+            copy.removePiece(new RemovePiece(ORIGIN));
 
             assertTrue(grid.isCoordinateOccupied(ORIGIN));
             assertFalse(copy.isCoordinateOccupied(ORIGIN));
@@ -672,7 +672,7 @@ class HiveGridTest {
             place(whitePiece(HivePieceType.QUEEN_BEE), ORIGIN);
 
             HiveGrid copy = new HiveGrid(grid);
-            grid.removePiece(ORIGIN);
+            grid.removePiece(new RemovePiece(ORIGIN));
 
             assertFalse(grid.isCoordinateOccupied(ORIGIN));
             assertTrue(copy.isCoordinateOccupied(ORIGIN));

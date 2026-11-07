@@ -23,7 +23,7 @@ public class HiveGrid {
     private HexCoordinate lockedCoordinate;
 
     public HiveGrid() {
-        this.pieceLocations = new Hashmap<>();
+        this.pieceLocations = new HashMap<>();
         this.grid = new HashMap<>();
         this.lockedCoordinate = null;
     }
@@ -43,6 +43,7 @@ public class HiveGrid {
             this.grid.put(coordinate, stack);
         }
 
+        this.pieceLocations = new HashMap<>(other.pieceLocations);
         this.lockedCoordinate = other.lockedCoordinate;
     }
 
@@ -57,32 +58,6 @@ public class HiveGrid {
         } else {
             throw new InvalidMoveException("Invalid move type: " + move.getClass().getSimpleName());
         }
-    }
-
-    private void movePiece(MovePiece moveMove) {
-        // Get piece from grid
-        HexCoordinate from = moveMove.from();
-        HivePiece piece = getPiece(from);
-
-        // Move piece on grid
-        movePiece(moveMove);
-
-        // Update piece location on board
-        pieceLocations.put(piece, moveMove.to());
-
-        // Lock the destination coordinate
-        lockCoordinate(moveMove.to());
-    }
-
-    private void placePiece(PlacePiece placeMove) {
-        placePiece(placeMove);
-        pieceLocations.put(placeMove.piece(), placeMove.position());
-    }
-
-    private void removePiece(RemovePiece removeMove) {
-        HivePiece piece = getPiece(removeMove.position());
-        removePiece(removeMove);
-        pieceLocations.remove(piece);
     }
 
     public List<HexCoordinate> getValidPlacementCoordinates(Player player) {
@@ -175,6 +150,7 @@ public class HiveGrid {
         stack.push(piece);
 
         grid.put(coordinate, stack);
+        pieceLocations.put(piece, coordinate);
     }
 
     public void removePiece(RemovePiece move) {
@@ -184,21 +160,13 @@ public class HiveGrid {
             throw new InvalidMoveException("Coordinate not occupied");
         }
 
-        grid.get(coordinate).pop();
-        if (grid.get(coordinate).isEmpty()) {
-            grid.remove(coordinate);
-        }
-    }
-
-    public void removePiece(HexCoordinate coordinate) {
-        if (!grid.containsKey(coordinate)) {
-            throw new InvalidMoveException("Coordinate not occupied");
-        }
+        HivePiece piece = getPiece(coordinate);
 
         grid.get(coordinate).pop();
         if (grid.get(coordinate).isEmpty()) {
             grid.remove(coordinate);
         }
+        pieceLocations.remove(piece);
     }
 
     public HivePiece getPiece(HexCoordinate coordinate) {
@@ -239,6 +207,10 @@ public class HiveGrid {
             stack.push(piece);
             grid.put(to, stack);
         }
+
+        pieceLocations.put(piece, to);
+
+        lockCoordinate(to);
     }
 
     public boolean isClimbUp(HexCoordinate from, HexCoordinate to) {
@@ -375,7 +347,6 @@ public class HiveGrid {
             return moves;
         }
 
-        HivePiece piece = grid.get(coordinate).peek();
         PieceMovementStrategy movementStrategy = piece.getType().getMovementStrategy();
 
         return movementStrategy.getValidMoves(coordinate, this);

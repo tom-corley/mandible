@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import dev.tomcorley.mandible.engine.HexCoordinate;
 import dev.tomcorley.mandible.engine.HiveGrid;
 import dev.tomcorley.mandible.engine.MovePiece;
+import dev.tomcorley.mandible.engine.RemovePiece;
 
 public class AntMovement implements PieceMovementStrategy {
     @Override
@@ -18,7 +19,7 @@ public class AntMovement implements PieceMovementStrategy {
         List<MovePiece> moves = new ArrayList<>();
 
         HiveGrid gridCopy = grid.copy();
-        gridCopy.removePiece(coordinate);
+        gridCopy.removePiece(new RemovePiece(coordinate));
 
         // We need to essentially bfs from the ants position sliding along one edge at a time, keeping track of visited coordinates
         Queue<HexCoordinate> queue = new ArrayDeque<>();

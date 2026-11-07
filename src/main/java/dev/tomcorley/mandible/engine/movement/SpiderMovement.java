@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import dev.tomcorley.mandible.engine.HexCoordinate;
 import dev.tomcorley.mandible.engine.HiveGrid;
 import dev.tomcorley.mandible.engine.MovePiece;
+import dev.tomcorley.mandible.engine.RemovePiece;
 
 public class SpiderMovement implements PieceMovementStrategy {
     @Override
@@ -17,7 +18,7 @@ public class SpiderMovement implements PieceMovementStrategy {
         List<MovePiece> moves = new ArrayList<>();
 
         HiveGrid gridCopy = grid.copy();
-        gridCopy.removePiece(coordinate);
+        gridCopy.removePiece(new RemovePiece(coordinate));
 
         // Set up path array and dfs stack
         Deque<List<HexCoordinate>> stack = new ArrayDeque<>();
