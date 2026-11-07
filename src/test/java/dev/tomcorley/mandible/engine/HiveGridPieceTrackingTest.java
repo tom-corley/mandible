@@ -9,9 +9,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class HiveBoardTest {
+class HiveGridPieceTrackingTest {
 
-    private HiveBoard board;
+    private HiveGrid board;
     private final TestPieceFactory pieces = new TestPieceFactory();
 
     private HivePiece white(HivePieceType type) {
@@ -24,7 +24,7 @@ class HiveBoardTest {
 
     @BeforeEach
     void setUp() {
-        board = new HiveBoard();
+        board = new HiveGrid();
         pieces.reset();
     }
 
@@ -43,7 +43,7 @@ class HiveBoardTest {
             board.makeMove(new PlacePiece(coord, queen));
 
             assertTrue(board.isPiecePlaced(queen));
-            assertTrue(board.getGrid().isCoordinateOccupied(coord));
+            assertTrue(board.isCoordinateOccupied(coord));
             assertEquals(coord, board.getPieceLocations().get(queen));
         }
 
@@ -61,8 +61,8 @@ class HiveBoardTest {
             board.makeMove(new MovePiece(from, dest));
 
             assertEquals(dest, board.getPieceLocations().get(queen));
-            assertFalse(board.getGrid().isCoordinateOccupied(from));
-            assertTrue(board.getGrid().isCoordinateOccupied(dest));
+            assertFalse(board.isCoordinateOccupied(from));
+            assertTrue(board.isCoordinateOccupied(dest));
         }
 
         @Test
@@ -75,7 +75,7 @@ class HiveBoardTest {
             board.makeMove(new RemovePiece(coord));
 
             assertFalse(board.isPiecePlaced(queen));
-            assertFalse(board.getGrid().isCoordinateOccupied(coord));
+            assertFalse(board.isCoordinateOccupied(coord));
         }
 
         @Test

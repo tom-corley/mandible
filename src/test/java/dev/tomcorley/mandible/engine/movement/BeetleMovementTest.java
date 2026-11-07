@@ -47,7 +47,7 @@ class BeetleMovementTest {
             place(white(HivePieceType.BEETLE), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // Slide destinations (same as queen)
@@ -61,7 +61,7 @@ class BeetleMovementTest {
             place(white(HivePieceType.BEETLE), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // Can climb onto the ant
@@ -74,7 +74,7 @@ class BeetleMovementTest {
             place(white(HivePieceType.BEETLE), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // 2 slide positions + 1 climb = 3 total
             assertEquals(3, moves.size());
@@ -85,7 +85,7 @@ class BeetleMovementTest {
         void aloneNoMoves() {
             place(white(HivePieceType.BEETLE), ORIGIN);
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             assertTrue(moves.isEmpty());
         }
 
@@ -96,7 +96,7 @@ class BeetleMovementTest {
             place(white(HivePieceType.BEETLE), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             assertTrue(moves.isEmpty());
         }
 
@@ -108,7 +108,7 @@ class BeetleMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
             place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // Can climb onto both neighbours
@@ -135,7 +135,7 @@ class BeetleMovementTest {
         void canClimbDown() {
             stackBeetleOnOrigin();
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // Can climb down to some empty neighbour positions
@@ -149,7 +149,7 @@ class BeetleMovementTest {
         void canClimbAcross() {
             stackBeetleOnOrigin();
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // (-1,0) is occupied — beetle can climb across to it
@@ -161,7 +161,7 @@ class BeetleMovementTest {
         void noSlideRulesWhenStacked() {
             stackBeetleOnOrigin();
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // Stacked beetle should be able to reach all 6 neighbours
             // (climb across occupied + climb down to empty)
@@ -175,7 +175,7 @@ class BeetleMovementTest {
             stackBeetleOnOrigin();
 
             // The beetle is on top of a stack — removing it doesn't break the hive
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             assertFalse(moves.isEmpty());
         }
 

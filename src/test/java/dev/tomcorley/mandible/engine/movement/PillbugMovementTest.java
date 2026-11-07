@@ -47,7 +47,7 @@ class PillbugMovementTest {
             place(white(HivePieceType.PILLBUG), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
             // Queen-like slides
@@ -60,7 +60,7 @@ class PillbugMovementTest {
         void aloneNoMoves() {
             place(white(HivePieceType.PILLBUG), ORIGIN);
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             assertTrue(moves.isEmpty());
         }
 
@@ -71,7 +71,7 @@ class PillbugMovementTest {
             place(white(HivePieceType.PILLBUG), ORIGIN);
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             assertTrue(moves.isEmpty());
         }
     }
@@ -90,7 +90,7 @@ class PillbugMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
             place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // Should include moves where the ant at (1,0) is moved to an empty pillbug neighbour
             boolean hasNeighbourMove = moves.stream()
@@ -105,7 +105,7 @@ class PillbugMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
             place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // All neighbour-moving moves should land on empty pillbug-adjacent cells
             List<MovePiece> neighbourMoves = moves.stream()
@@ -130,7 +130,7 @@ class PillbugMovementTest {
             // Move beetle on top of ant
             grid.movePiece(new MovePiece(new HexCoordinate(0, 1), new HexCoordinate(1, 0)));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // Pillbug should not generate moves from the stacked position (1,0)
             boolean hasStackedNeighbourMove = moves.stream()
@@ -146,7 +146,7 @@ class PillbugMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
             place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             // (1,0) is a bridge between (0,0) and (2,0) — pillbug can't move it
             boolean hasBridgeMove = moves.stream()
@@ -184,7 +184,7 @@ class PillbugMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(2, 0));  // pillar
             place(white(HivePieceType.ANT), new HexCoordinate(0, 1));  // free neighbour
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             assertFalse(moves.stream().anyMatch(m -> m.from().equals(new HexCoordinate(1, 0))),
                 "Bridge piece at (1,0) must not be thrown by the pillbug");
@@ -238,7 +238,7 @@ class PillbugMovementTest {
             place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
             place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
             boolean hasOwnMove = moves.stream()
                     .anyMatch(m -> m.from().equals(ORIGIN));
@@ -269,7 +269,7 @@ class PillbugMovementTest {
         void lockedNeighbourCannotBeThrown() {
             grid.lockCoordinate(antCoord);
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             boolean canThrow = moves.stream().anyMatch(m -> m.from().equals(antCoord));
             assertFalse(canThrow);
         }
@@ -279,7 +279,7 @@ class PillbugMovementTest {
         void lockedPieceCannotMoveSelf() {
             grid.lockCoordinate(antCoord);
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(antCoord);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(antCoord));
             assertTrue(moves.isEmpty());
         }
 
@@ -289,7 +289,7 @@ class PillbugMovementTest {
             grid.lockCoordinate(antCoord);
             grid.clearLockedCoordinate();
 
-            List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+            List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
             boolean canThrow = moves.stream().anyMatch(m -> m.from().equals(antCoord));
             assertTrue(canThrow);
         }

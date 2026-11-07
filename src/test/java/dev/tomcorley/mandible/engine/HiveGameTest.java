@@ -26,7 +26,7 @@ class HiveGameTest {
     private HivePiece pieceFromHand(Player player, HivePieceType type) {
         return player.getHand().stream()
                 .filter(p -> p.getType() == type)
-                .filter(p -> !game.getBoard().isPiecePlaced(p))
+                .filter(p -> !game.getGrid().isPiecePlaced(p))
                 .findFirst()
                 .orElseThrow();
     }
@@ -249,8 +249,8 @@ class HiveGameTest {
 
             for (HexCoordinate coord : coords) {
                 boolean touchesBlack = coord.getNeighbours().stream()
-                        .anyMatch(n -> game.getBoard().getGrid().isCoordinateOccupied(n) &&
-                                game.getBoard().getGrid().getPiece(n).getColour() == PlayerColour.BLACK);
+                        .anyMatch(n -> game.getGrid().isCoordinateOccupied(n) &&
+                                game.getGrid().getPiece(n).getColour() == PlayerColour.BLACK);
                 assertFalse(touchesBlack, coord + " should not be adjacent to a black piece");
             }
         }
@@ -422,8 +422,8 @@ class HiveGameTest {
 
             game.undoMove();
 
-            assertFalse(game.getBoard().isPiecePlaced(queen));
-            assertFalse(game.getBoard().getGrid().isCoordinateOccupied(coord));
+            assertFalse(game.getGrid().isPiecePlaced(queen));
+            assertFalse(game.getGrid().isCoordinateOccupied(coord));
             assertEquals(0, game.getMoveHistory().size());
         }
 
@@ -442,9 +442,9 @@ class HiveGameTest {
 
             game.undoMove();
 
-            assertEquals(origin, game.getBoard().getPieceLocations().get(queen));
-            assertTrue(game.getBoard().getGrid().isCoordinateOccupied(origin));
-            assertFalse(game.getBoard().getGrid().isCoordinateOccupied(dest));
+            assertEquals(origin, game.getGrid().getPieceLocations().get(queen));
+            assertTrue(game.getGrid().isCoordinateOccupied(origin));
+            assertFalse(game.getGrid().isCoordinateOccupied(dest));
         }
 
         @Test
@@ -456,7 +456,7 @@ class HiveGameTest {
             game.executeMove(null);
             game.undoMove();
 
-            assertTrue(game.getBoard().isPiecePlaced(queen));
+            assertTrue(game.getGrid().isPiecePlaced(queen));
             assertEquals(1, game.getMoveHistory().size());
         }
 
@@ -493,8 +493,8 @@ class HiveGameTest {
 
             game.undoMove();
 
-            assertTrue(game.getBoard().getGrid().isCoordinateLocked(qDest));
-            assertFalse(game.getBoard().getGrid().isCoordinateLocked(aDest));
+            assertTrue(game.getGrid().isCoordinateLocked(qDest));
+            assertFalse(game.getGrid().isCoordinateLocked(aDest));
         }
     }
 

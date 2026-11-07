@@ -42,7 +42,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));  // NE neighbour
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         assertTrue(moves.stream().anyMatch(m -> m.to().equals(new HexCoordinate(2, 0))));
     }
@@ -55,7 +55,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Should land at (4,0) — first empty space after the line
         assertTrue(moves.stream().anyMatch(m -> m.to().equals(new HexCoordinate(4, 0))));
@@ -70,7 +70,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Origin's neighbours that are empty should not appear as destinations
@@ -90,7 +90,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));   // N
         place(black(HivePieceType.ANT), new HexCoordinate(-1, 1));  // NW
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         assertEquals(3, moves.size());
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
@@ -104,7 +104,7 @@ class GrasshopperMovementTest {
     void noAdjacentPiecesNoMoves() {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -115,7 +115,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -126,7 +126,7 @@ class GrasshopperMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 
@@ -136,7 +136,7 @@ class GrasshopperMovementTest {
         place(white(HivePieceType.GRASSHOPPER), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertFalse(destinations.contains(new HexCoordinate(1, 0)));

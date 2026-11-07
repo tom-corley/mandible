@@ -53,7 +53,7 @@ class GameFactoryTest {
     @DisplayName("board starts empty")
     void boardStartsEmpty() {
         HiveGame game = GameFactory.createStandardBotVsBotGame();
-        assertTrue(game.getBoard().getPieceLocations().isEmpty());
+        assertTrue(game.getGrid().getPieceLocations().isEmpty());
     }
 
     @Test
@@ -115,7 +115,7 @@ class GameFactoryTest {
         HiveGame game1 = GameFactory.createStandardBotVsBotGame();
         HiveGame game2 = GameFactory.createStandardBotVsBotGame();
         assertNotSame(game1, game2);
-        assertNotSame(game1.getBoard(), game2.getBoard());
+        assertNotSame(game1.getGrid(), game2.getGrid());
     }
     }
 
@@ -149,7 +149,7 @@ class GameFactoryTest {
         @DisplayName("board starts empty")
         void boardStartsEmpty() {
             HiveGame game = GameFactory.createExpandedBotVsBotGame();
-            assertTrue(game.getBoard().getPieceLocations().isEmpty());
+            assertTrue(game.getGrid().getPieceLocations().isEmpty());
         }
 
         @Test
@@ -221,7 +221,7 @@ class GameFactoryTest {
             HiveGame game1 = GameFactory.createExpandedBotVsBotGame();
             HiveGame game2 = GameFactory.createExpandedBotVsBotGame();
             assertNotSame(game1, game2);
-            assertNotSame(game1.getBoard(), game2.getBoard());
+            assertNotSame(game1.getGrid(), game2.getGrid());
         }
     }
 }

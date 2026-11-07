@@ -42,7 +42,7 @@ class MosquitoMovementTest {
         place(white(HivePieceType.MOSQUITO), ORIGIN);
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Same destinations as a queen: one-step edge slides
@@ -59,7 +59,7 @@ class MosquitoMovementTest {
         // Connect hive so mosquito is movable
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Grasshopper-like jump: over (1,0) to (2,0)
@@ -74,7 +74,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.BEETLE), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Beetle move: climb onto (1,0)
@@ -91,7 +91,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(-1, 0));
         grid.movePiece(new MovePiece(new HexCoordinate(1, 0), ORIGIN));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Stacked mosquito acts as beetle — should have climb across + climb down options
         assertFalse(moves.isEmpty());
@@ -111,7 +111,7 @@ class MosquitoMovementTest {
         // And to give (1,0) mosquito a real piece to copy from
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Mosquito at origin ignores the mosquito at (1,0)
         // It still gets its own queen-like slides from slideAlongOneEdge
@@ -128,7 +128,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertTrue(destinations.contains(new HexCoordinate(3, 0)),
@@ -145,7 +145,7 @@ class MosquitoMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Either 3-step arc destination confirms spider copying works
@@ -163,7 +163,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.PILLBUG), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         boolean hasThrow = moves.stream()
                 .anyMatch(m -> m.from().equals(new HexCoordinate(0, 1)));
@@ -175,7 +175,7 @@ class MosquitoMovementTest {
     void mosquitoAloneNoMoves() {
         place(white(HivePieceType.MOSQUITO), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -187,7 +187,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         long uniqueCount = moves.stream().map(MovePiece::to).distinct().count();
         assertEquals(moves.size(), uniqueCount);
     }
@@ -199,7 +199,7 @@ class MosquitoMovementTest {
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 
@@ -210,7 +210,7 @@ class MosquitoMovementTest {
         place(white(HivePieceType.MOSQUITO), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 }

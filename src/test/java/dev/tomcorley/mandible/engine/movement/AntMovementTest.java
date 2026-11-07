@@ -44,7 +44,7 @@ class AntMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Ant can reach any edge position around the 2-piece hive — far more than queen's 2
         assertTrue(moves.size() > 2);
@@ -57,7 +57,7 @@ class AntMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Ant should reach the far side of the chain
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
@@ -72,7 +72,7 @@ class AntMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertFalse(destinations.contains(ORIGIN));
@@ -85,7 +85,7 @@ class AntMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertFalse(destinations.contains(new HexCoordinate(1, 0)));
@@ -97,7 +97,7 @@ class AntMovementTest {
     void antAloneNoMoves() {
         place(white(HivePieceType.ANT), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -110,7 +110,7 @@ class AntMovementTest {
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 0));
 
         // With pieces at N and NE forming a gate, ant still finds paths around
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertFalse(moves.isEmpty());
     }
 
@@ -121,7 +121,7 @@ class AntMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 
@@ -132,7 +132,7 @@ class AntMovementTest {
         place(white(HivePieceType.ANT), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -144,7 +144,7 @@ class AntMovementTest {
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         long uniqueCount = moves.stream().map(MovePiece::to).distinct().count();
         assertEquals(moves.size(), uniqueCount);
     }
@@ -157,7 +157,7 @@ class AntMovementTest {
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(2, 0));
 
         // The ant is removed from the grid during movement, so hive = (1,0), (2,0)
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         for (MovePiece move : moves) {
             boolean adjacentToHive = move.to().getNeighbours().stream()

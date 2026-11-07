@@ -46,7 +46,7 @@ class SpiderMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Two paths of exactly 3 steps: one "above" and one "below" the chain
         assertEquals(2, moves.size());
@@ -63,7 +63,7 @@ class SpiderMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // 1-step destinations (queen-like) should not appear
@@ -82,7 +82,7 @@ class SpiderMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertFalse(destinations.contains(ORIGIN));
@@ -93,7 +93,7 @@ class SpiderMovementTest {
     void spiderAloneNoMoves() {
         place(white(HivePieceType.SPIDER), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -108,7 +108,7 @@ class SpiderMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(0, 1));
         place(white(HivePieceType.ANT), new HexCoordinate(-1, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         long uniqueDestinations = moves.stream().map(MovePiece::to).distinct().count();
 
         assertEquals(moves.size(), uniqueDestinations);
@@ -122,7 +122,7 @@ class SpiderMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.ANT), new HexCoordinate(3, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 
@@ -134,7 +134,7 @@ class SpiderMovementTest {
         place(white(HivePieceType.SPIDER), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 }
