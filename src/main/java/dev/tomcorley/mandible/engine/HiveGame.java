@@ -1,5 +1,6 @@
 package dev.tomcorley.mandible.engine;
 
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -157,16 +158,22 @@ public class HiveGame {
     }
 
     public void executeMove(HiveMove move) {
+        if (move == null) {
+          throw new InvalidMoveException("Move cannot be null.");
+        }
+
         // Clear the locked coordinate set by the previous move
         grid.clearLockedCoordinate();
 
-        if (move == null) {
-            log.debug("No possible moves, skipping turn for {}", currentPlayer.getColour());
-        } else {
-            makeMove(move);
-        }
+        makeMove(move);
 
         moveHistory.add(move);
+
+        Optional<HexCoordinate> coordinateToLock = move.coordinateToLock();
+        if (coordinateToLock.isPresent()) {
+          grid.lockCoordinate(coordinateToLock.orElseThrow());
+    }
+
         addBoardStateToFrequencySet(currentStateKey());
     }
 
@@ -180,17 +187,16 @@ public class HiveGame {
 
         // Undo the last move
         HiveMove lastMove = moveHistory.remove(moveHistory.size() - 1);
-        if (lastMove != null) {
-            HiveMove invertedMove = lastMove.invertMove();
-            grid.makeMove(invertedMove);
-        }
+        HiveMove invertedMove = lastMove.invertMove();
+        grid.makeMove(invertedMove);
 
         // Restore the pillbug lock present before the last move
         grid.clearLockedCoordinate();
         if (!moveHistory.isEmpty()) {
             HiveMove penultimateMove = moveHistory.get(moveHistory.size() - 1);
-            if (penultimateMove instanceof MovePiece movePiece) {
-                grid.lockCoordinate(movePiece.to());
+
+            if (penultimateMove.coordinateToLock().isPresent()) {
+              grid.lockCoordinate(penultimateMove.coordinateToLock().orElseThrow());
             }
         }
 

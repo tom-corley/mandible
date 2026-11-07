@@ -31,7 +31,7 @@ public class BotController implements PlayerController {
 
         if (validMoves.isEmpty()) {
             log.debug("No valid moves, skipping turn");
-            return null;
+            return new PassMove();
         }
 
         int randomIndex = random.nextInt(validMoves.size());

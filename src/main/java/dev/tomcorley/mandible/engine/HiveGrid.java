@@ -55,6 +55,8 @@ public class HiveGrid {
             movePiece(moveMove);
         } else if (move instanceof RemovePiece removeMove) {
             removePiece(removeMove);
+        } else if (move instanceof PassMove) {
+          ;
         } else {
             throw new InvalidMoveException("Invalid move type: " + move.getClass().getSimpleName());
         }
@@ -209,8 +211,6 @@ public class HiveGrid {
         }
 
         pieceLocations.put(piece, to);
-
-        lockCoordinate(to);
     }
 
     public boolean isClimbUp(HexCoordinate from, HexCoordinate to) {
