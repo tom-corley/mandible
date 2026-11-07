@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class HiveGame {
     private static final Logger log = LoggerFactory.getLogger(HiveGame.class);
-    private final HiveBoard board;
+    private final HiveGrid grid;
     private final Player whitePlayer;
     private final Player blackPlayer;
     private Player currentPlayer;
@@ -22,7 +22,7 @@ public class HiveGame {
     private final Map<String, Integer> boardStateFrequencySet;
 
     public HiveGame(Player whitePlayer, Player blackPlayer) {
-        this.board = new HiveBoard();
+        this.grid = new HiveGrid();
         this.whitePlayer = whitePlayer;
         this.blackPlayer = blackPlayer;
         this.currentPlayer = whitePlayer;
@@ -85,16 +85,16 @@ public class HiveGame {
         HivePiece queenBee = player.getQueenBee();
 
         // If queen bee is not on the board, return false
-        if (!board.getPieceLocations().containsKey(queenBee)) {
+        if (!grid.getPieceLocations().containsKey(queenBee)) {
             return false;
         }
         
         // Otherwise get its coordinate
-        HexCoordinate queenBeeCoordinate = board.getPieceLocations().get(queenBee);
+        HexCoordinate queenBeeCoordinate = grid.getPieceLocations().get(queenBee);
 
         // Check for 6 occupied neighbours 
         for (HexCoordinate neighbour : queenBeeCoordinate.getNeighbours()) {
-            if (!board.isCoordinateOccupied(neighbour)) {
+            if (!grid.isCoordinateOccupied(neighbour)) {
                 return false;
             }
         }
@@ -103,7 +103,7 @@ public class HiveGame {
     }
 
     public void makeMove(HiveMove move) {
-        board.makeMove(move);
+        grid.makeMove(move);
     }
 
     public void advanceTurn() {
@@ -123,16 +123,16 @@ public class HiveGame {
 
     public List<PlacePiece> getValidPlacementMoves(Player player) {
         // Get valid placement coordinates
-        List<HexCoordinate> validCoordinates = board.getValidPlacementCoordinates(player);
+        List<HexCoordinate> validCoordinates = grid.getValidPlacementCoordinates(player);
 
         // Get pieces in player's hand that are unplaced
         List<HivePiece> unplacedPieces = player.getHand().stream()
-            .filter(piece -> !board.isPiecePlaced(piece))
+            .filter(piece -> !grid.isPiecePlaced(piece))
             .collect(Collectors.toList());
 
         // If it is the fourth turn and they have not placed the queen they must do so
         HivePiece queen = player.getQueenBee();
-        if (!board.isPiecePlaced(queen) && this.turnCount >= 4) {
+        if (!grid.isPiecePlaced(queen) && this.turnCount >= 4) {
             unplacedPieces = List.of(queen);
         }
 
@@ -153,12 +153,12 @@ public class HiveGame {
     }
 
     private String currentStateKey() {
-        return board.toStateKey() + "|" + nextPlayer().getColour();
+        return grid.toStateKey() + "|" + nextPlayer().getColour();
     }
 
     public void executeMove(HiveMove move) {
         // Clear the locked coordinate set by the previous move
-        board.clearLockedCoordinate();
+        grid.clearLockedCoordinate();
 
         if (move == null) {
             log.debug("No possible moves, skipping turn for {}", currentPlayer.getColour());
@@ -182,15 +182,15 @@ public class HiveGame {
         HiveMove lastMove = moveHistory.remove(moveHistory.size() - 1);
         if (lastMove != null) {
             HiveMove invertedMove = lastMove.invertMove();
-            board.makeMove(invertedMove);
+            grid.makeMove(invertedMove);
         }
 
         // Restore the pillbug lock present before the last move
-        board.clearLockedCoordinate();
+        grid.clearLockedCoordinate();
         if (!moveHistory.isEmpty()) {
             HiveMove penultimateMove = moveHistory.get(moveHistory.size() - 1);
             if (penultimateMove instanceof MovePiece movePiece) {
-                board.lockCoordinate(movePiece.to());
+                grid.lockCoordinate(movePiece.to());
             }
         }
 
@@ -213,12 +213,12 @@ public class HiveGame {
 
         // If queen has been placed yet cannot move any pieces
         HivePiece queen = player.getQueenBee();
-        if (!board.isPiecePlaced(queen)) {
+        if (!grid.isPiecePlaced(queen)) {
             return moves;
         }
 
         for (HivePiece piece : playerPieces) {
-            List<MovePiece> pieceMoves = board.getValidMovesForPiece(piece);
+            List<MovePiece> pieceMoves = grid.getValidMovesForPiece(piece);
             moves.addAll(pieceMoves);
         }
 
@@ -247,8 +247,8 @@ public class HiveGame {
         return state;
     }
 
-    public HiveBoard getBoard() {
-        return board;
+    public HiveGrid getGrid() {
+        return grid;
     }
 
     public Player getWhitePlayer() {

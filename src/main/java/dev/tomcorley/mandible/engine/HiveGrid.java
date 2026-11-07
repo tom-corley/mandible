@@ -14,15 +14,24 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.Collections;
 
+/* 
+ * Owns the grid and its properties, as well as the position of counters
+ * */
 public class HiveGrid {
     private final Map<HexCoordinate, Deque<HivePiece>> grid;
+    private final Map<HivePiece, HexCoordinate> pieceLocations;
     private HexCoordinate lockedCoordinate;
 
     public HiveGrid() {
+        this.pieceLocations = new Hashmap<>();
         this.grid = new HashMap<>();
         this.lockedCoordinate = null;
     }
 
+    public Map<HivePiece, HexCoordinate> getPieceLocations() {
+        return Collections.unmodifiableMap(pieceLocations);
+    }
+ 
     public HiveGrid(HiveGrid other) {
         this.grid = new HashMap<>();
 
@@ -37,6 +46,68 @@ public class HiveGrid {
         this.lockedCoordinate = other.lockedCoordinate;
     }
 
+    // When a move is made, update locations and grid
+    public void makeMove(HiveMove move) {
+        if (move instanceof PlacePiece placeMove) {
+            placePiece(placeMove);
+        } else if (move instanceof MovePiece moveMove) {
+            movePiece(moveMove);
+        } else if (move instanceof RemovePiece removeMove) {
+            removePiece(removeMove);
+        } else {
+            throw new InvalidMoveException("Invalid move type: " + move.getClass().getSimpleName());
+        }
+    }
+
+    private void movePiece(MovePiece moveMove) {
+        // Get piece from grid
+        HexCoordinate from = moveMove.from();
+        HivePiece piece = getPiece(from);
+
+        // Move piece on grid
+        movePiece(moveMove);
+
+        // Update piece location on board
+        pieceLocations.put(piece, moveMove.to());
+
+        // Lock the destination coordinate
+        lockCoordinate(moveMove.to());
+    }
+
+    private void placePiece(PlacePiece placeMove) {
+        placePiece(placeMove);
+        pieceLocations.put(placeMove.piece(), placeMove.position());
+    }
+
+    private void removePiece(RemovePiece removeMove) {
+        HivePiece piece = getPiece(removeMove.position());
+        removePiece(removeMove);
+        pieceLocations.remove(piece);
+    }
+
+    public List<HexCoordinate> getValidPlacementCoordinates(Player player) {
+        PlayerColour colour = player.getColour();
+        return getValidPlacementPositions(colour);
+    }
+
+    public boolean isPieceOnTopOfStack(HivePiece piece) {
+        // If piece is not placed, return false
+        if (!isPiecePlaced(piece)) {
+            return false;
+        }
+
+        // Get the coordinate of the piece
+        HexCoordinate coordinate = pieceLocations.get(piece);
+
+        // We need to check if the piece on the top of the stack at that coordinate is our piece
+        HivePiece topPiece = getPiece(coordinate);
+        return topPiece.equals(piece);
+    }
+
+    public boolean isPiecePlaced(HivePiece piece) {
+        return pieceLocations.containsKey(piece);
+    }
+    
     public HiveGrid copy() {
         return new HiveGrid(this);
     }
@@ -286,8 +357,18 @@ public class HiveGrid {
         return occupiedCoordinates.isEmpty();
     }
 
-    public List<MovePiece> getValidMovesForPiece(HexCoordinate coordinate) {
+    public List<MovePiece> getValidMovesForPiece(HivePiece piece) {
         List<MovePiece> moves = new ArrayList<>();
+
+        if (!isPiecePlaced(piece)) {
+          return moves;
+        }
+
+        if (!isPieceOnTopOfStack(piece)) {
+          return moves;
+        }
+
+        HexCoordinate coordinate = pieceLocations.get(piece);
 
         // If piece is not movable, return empty list
         if (!isPieceMovable(coordinate)) {

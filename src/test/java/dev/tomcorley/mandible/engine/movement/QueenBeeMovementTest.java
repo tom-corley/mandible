@@ -42,7 +42,7 @@ class QueenBeeMovementTest {
         place(white(HivePieceType.QUEEN_BEE), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         assertEquals(2, moves.size());
         // Should be able to slide to the two shared-edge positions
@@ -59,7 +59,7 @@ class QueenBeeMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(0, 1));   // N
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));   // NE
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // NE direction (1,0) is occupied, N direction (0,1) is occupied
@@ -76,7 +76,7 @@ class QueenBeeMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Queen slides along the edge — every destination must be adjacent to the ant at (1,0)
@@ -91,7 +91,7 @@ class QueenBeeMovementTest {
     void queenAloneNoMoves() {
         place(white(HivePieceType.QUEEN_BEE), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -103,7 +103,7 @@ class QueenBeeMovementTest {
             place(black(HivePieceType.ANT), ORIGIN.add(dir));
         }
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -113,7 +113,7 @@ class QueenBeeMovementTest {
         place(white(HivePieceType.QUEEN_BEE), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 }

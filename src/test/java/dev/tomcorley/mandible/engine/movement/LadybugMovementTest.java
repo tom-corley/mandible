@@ -45,7 +45,7 @@ class LadybugMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         for (MovePiece move : moves) {
             assertFalse(grid.isCoordinateOccupied(move.to()),
@@ -60,7 +60,7 @@ class LadybugMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         // Ladybug goes over the top — should reach positions not adjacent to origin
@@ -74,7 +74,7 @@ class LadybugMovementTest {
     void ladybugAloneNoMoves() {
         place(white(HivePieceType.LADYBUG), ORIGIN);
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -84,7 +84,7 @@ class LadybugMovementTest {
         place(white(HivePieceType.LADYBUG), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // With only one adjacent piece, ladybug climbs up to (1,0) then needs to climb across
         // to another occupied cell — but there is none. So no complete up-across-down path.
@@ -103,7 +103,7 @@ class LadybugMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.QUEEN_BEE), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertFalse(moves.isEmpty(), "Two neighbours should give the ladybug paths");
     }
 
@@ -115,7 +115,7 @@ class LadybugMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.stream().allMatch(m -> m.from().equals(ORIGIN)));
     }
 
@@ -127,7 +127,7 @@ class LadybugMovementTest {
         place(white(HivePieceType.ANT), new HexCoordinate(2, 0));
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         long uniqueCount = moves.stream().map(MovePiece::to).distinct().count();
         assertEquals(moves.size(), uniqueCount);
     }
@@ -139,7 +139,7 @@ class LadybugMovementTest {
         place(white(HivePieceType.LADYBUG), ORIGIN);
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         assertTrue(moves.isEmpty());
     }
 
@@ -151,7 +151,7 @@ class LadybugMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
         List<HexCoordinate> destinations = moves.stream().map(MovePiece::to).toList();
 
         assertTrue(destinations.contains(ORIGIN));
@@ -167,7 +167,7 @@ class LadybugMovementTest {
         place(black(HivePieceType.QUEEN_BEE), new HexCoordinate(1, 1));
         place(white(HivePieceType.SPIDER), new HexCoordinate(2, 0));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         assertTrue(moves.size() > 2, "Larger hive should give ladybug many destinations");
     }
@@ -180,7 +180,7 @@ class LadybugMovementTest {
         place(black(HivePieceType.ANT), new HexCoordinate(1, 0));
         place(white(HivePieceType.ANT), new HexCoordinate(0, 1));
 
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         // Ladybug climbs up onto one piece, across to the other, down to an empty neighbour
         // All destinations must be adjacent to at least one of the two pieces
@@ -203,7 +203,7 @@ class LadybugMovementTest {
 
         // Remove the ladybug from grid to simulate what the movement sees
         // (ladybug removes itself before computing destinations)
-        List<MovePiece> moves = grid.getValidMovesForPiece(ORIGIN);
+        List<MovePiece> moves = grid.getValidMovesForPiece(grid.getPiece(ORIGIN));
 
         for (MovePiece move : moves) {
             if (move.to().equals(ORIGIN)) continue;

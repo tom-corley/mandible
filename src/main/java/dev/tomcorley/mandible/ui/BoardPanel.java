@@ -47,7 +47,7 @@ public class BoardPanel extends JPanel {
         int cx = getWidth() / 2;
         int cy = sectionHeight / 2;
 
-        for (Map.Entry<HexCoordinate, Deque<HivePiece>> entry : game.getBoard().getGrid().getGrid().entrySet()) {
+        for (Map.Entry<HexCoordinate, Deque<HivePiece>> entry : game.getGrid().getGrid().entrySet()) {
             HexCoordinate hex = entry.getKey();
             HivePiece piece = entry.getValue().peek();
             if (piece == null) continue;
@@ -60,7 +60,7 @@ public class BoardPanel extends JPanel {
     }
 
     private void drawHands(Graphics2D g, int yOffset) {
-        Set<HivePiece> placed = game.getBoard().getPieceLocations().keySet();
+        Set<HivePiece> placed = game.getGrid().getPieceLocations().keySet();
         int handCenterY = yOffset + (getHeight() - yOffset) / 2;
 
         drawPlayerHand(g, game.getWhitePlayer(), placed, 0, getWidth() / 2, handCenterY);
